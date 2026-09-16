@@ -1,0 +1,164 @@
+// Money strategy: all currency amounts are integer minor units (e.g. R$10.50
+// -> 1050), fields suffixed `Minor`. Fractional quantities (crypto/share
+// counts) and prices that need sub-cent precision are stored as decimal
+// STRINGS (not Prisma's Decimal type, which SQLite cannot store reliably —
+// SQLite gives it NUMERIC affinity and silently loses precision past ~15
+// significant digits) and parsed with decimal.js in the domain layer.
+// See docs/ARCHITECTURE.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum AssetType {
+  CDB
+  TESOURO_DIRETO
+  STOCK
+  ETF
+  CRYPTO
+  FOREIGN_CURRENCY
+  OTHER
+}
+
+enum InvestmentTransactionType {
+  BUY
+  SELL
+  DEPOSIT
+  WITHDRAWAL
+  DIVIDEND
+  INTEREST
+  OTHER
+}
+
+enum WatchlistAssetClass {
+  CURRENCY
+  CRYPTO
+  STOCK
+  INDICATOR
+}
+
+model Category {
+  id           String            @id @default(cuid())
+  name         String
+  type         TransactionType
+  isSystem     Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([name, type])
+}
+
+model Transaction {
+  id          String           @id @default(cuid())
+  type        TransactionType
+  amountMinor Int
+  currency    String           @default("BRL")
+  description String
+  date        DateTime
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([date])
+  @@index([categoryId])
+  @@index([type])
+}
+
+model Budget {
+  id           String   @id @default(cuid())
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id])
+  month        String // "YYYY-MM"
+  limitMinor   Int
+  createdAt    DateTime @default(now())
+
+  @@unique([categoryId, month])
+  @@index([month])
+}
+
+model Investment {
+  id                String                   @id @default(cuid())
+  name              String
+  assetType         AssetType
+  institution       String?
+  currency          String
+  quantity          String? // decimal string, e.g. "0.00034521"
+  purchasePriceMinor Int?
+  purchaseDate      DateTime?
+  currentValueMinor Int? // manually updated, or refreshed via watchlistSymbol
+  watchlistSymbol   String? // optional link to WatchlistItem.symbol for auto-refresh
+  notes             String?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  transactions      InvestmentTransaction[]
+}
+
+model InvestmentTransaction {
+  id                 String                     @id @default(cuid())
+  investmentId       String
+  investment         Investment                 @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  type               InvestmentTransactionType
+  amountMinor        Int
+  quantity           String? // decimal string
+  pricePerUnitMinor  Int?
+  date               DateTime
+  notes              String?
+  createdAt          DateTime                   @default(now())
+
+  @@index([investmentId])
+  @@index([date])
+}
+
+model Goal {
+  id                 String    @id @default(cuid())
+  name               String
+  targetAmountMinor  Int
+  currentAmountMinor Int       @default(0)
+  targetDate         DateTime?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+// Single active strategy, fixed id = "singleton" — this is a personal app
+// with one user and one plan configuration at a time.
+model InvestmentPlanConfig {
+  id                               String   @id @default("singleton")
+  minMonthlyInvestmentMinor        Int      @default(0)
+  targetInvestmentRate             Float    @default(0.1)
+  minCashBufferMinor               Int      @default(0)
+  maxPercentOfAvailableCash        Float    @default(0.5)
+  expectedRecurringExpensesMinor   Int      @default(0)
+  updatedAt                        DateTime @updatedAt
+}
+
+model WatchlistItem {
+  id           String              @id @default(cuid())
+  symbol       String              @unique
+  label        String
+  assetClass   WatchlistAssetClass
+  baseCurrency String?
+  createdAt    DateTime            @default(now())
+}
+
+// Last-known market price, so a provider outage never blocks the app —
+// see MarketDataProvider in docs/ARCHITECTURE.md.
+model MarketPriceCache {
+  symbol String   @id
+  price  String // decimal string
+  asOf   DateTime
+  source String
+}
