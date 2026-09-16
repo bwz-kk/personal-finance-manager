@@ -6,12 +6,13 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 ## Status
 
-Phase 1 (Foundation), Phase 2 (Financial core), and Phase 3 (Budgets) are
-complete, not yet committed. No GitHub remote is configured right now —
-publishing is
-intentionally deferred while the core application gets built. `README.md` is
-temporarily removed for the same reason; it will be rewritten once there's an
-actual working app to describe.
+Phase 1 (Foundation), Phase 2 (Financial core), Phase 3 (Budgets), and
+Phase 4 (Investments) are complete. The repo is now public on GitHub
+(https://github.com/bwz-kk/personal-finance-manager) with a `claude-design`
+branch cut off the Phase 2/3 commit for UI/visual design work, kept separate
+from ongoing backend phase work on `master`. `README.md` is still
+temporarily removed; it'll be rewritten once the core application is done —
+Phase 9.
 
 Phase 2 delivered: Category CRUD (with default seeded categories, system
 categories protected from deletion), Transaction CRUD with filtering/sorting/
@@ -40,6 +41,26 @@ correctness) used to aggregate the real spend per category from
 navigation, add/edit/delete, a progress bar, and an overspend indicator — all
 verified live via Chrome (create → overspend rendering → edit → delete),
 translated in both languages.
+
+Phase 4 delivered: `Investment` + `InvestmentTransaction` CRUD. The schema
+was tightened first — `Investment.quantity`/`purchasePriceMinor` were dropped
+(migration `drop_investment_manual_quantity`) since they'd have been a second,
+conflicting source of truth alongside the transaction history; quantity and
+invested principal are now always computed fresh from `InvestmentTransaction`
+rows via `summarizeInvestmentTransactions` (BUY/DEPOSIT add, SELL/WITHDRAWAL
+subtract, DIVIDEND/INTEREST/OTHER are informational only — documented in the
+domain module). `currentValueMinor` stays the one manual mark-to-market field
+per `docs/ARCHITECTURE.md`. `calculateInvestmentReturn` and `calculatePortfolio`
+group strictly by currency — never summed across currencies — both pure and
+unit-tested (34 domain tests total now), including the divide-by-zero and
+empty-portfolio edge cases. Investment transactions are an append-only
+history: create + delete only, no edit (correct a mistake by deleting and
+re-adding). The Investments page has portfolio-by-currency summary cards,
+per-investment cards with expandable transaction history, and add/edit/delete
+for both — verified live via Chrome including a real two-currency portfolio
+(BRL + USD, confirmed never mixed).
+
+## Project context
 
 A personal finance manager, built primarily for personal use, with source
 published on GitHub eventually for continuous maintenance and improvement.
@@ -207,7 +228,7 @@ unnecessarily. Provide `.env.example` files and a correctly configured
 3. **Budgets** — monthly budgets, category budgets, budget calculations.
    _(Done.)_
 4. **Investments** — investments, investment transactions, portfolio
-   calculations.
+   calculations. _(Done.)_
 5. **Investment planner** — available cash calculation, investment strategy,
    suggested investment, configurable safety buffer, explanation of
    recommendation.

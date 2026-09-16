@@ -89,14 +89,17 @@ model Budget {
   @@index([month])
 }
 
+// Quantity and invested amount are NOT stored here — they're computed from
+// InvestmentTransaction history (see domain/portfolioCalculator.ts), so
+// there is exactly one source of truth for them. currentValueMinor is the
+// one exception: there's no live pricing yet, so it's a manual mark-to-market
+// field (or refreshed via watchlistSymbol once Phase 7 adds that).
 model Investment {
   id                String                   @id @default(cuid())
   name              String
   assetType         AssetType
   institution       String?
   currency          String
-  quantity          String? // decimal string, e.g. "0.00034521"
-  purchasePriceMinor Int?
   purchaseDate      DateTime?
   currentValueMinor Int? // manually updated, or refreshed via watchlistSymbol
   watchlistSymbol   String? // optional link to WatchlistItem.symbol for auto-refresh

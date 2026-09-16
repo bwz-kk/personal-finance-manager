@@ -80,6 +80,43 @@ export interface Translations {
     deleteTitle: string
     deleteMessage: (categoryName: string) => string
   }
+  investments: {
+    title: string
+    addInvestment: string
+    editInvestment: string
+    name: string
+    assetType: string
+    institutionOptional: string
+    currency: string
+    currentValue: string
+    currentValueOptional: string
+    invested: string
+    return: string
+    empty: string
+    loading: string
+    loadError: string
+    viewTransactions: string
+    hideTransactions: string
+    addTransaction: string
+    transactionType: string
+    amount: string
+    quantityOptional: string
+    date: string
+    noTransactions: string
+    deleteTitle: string
+    deleteMessage: (name: string) => string
+    deleteTransactionTitle: string
+    deleteTransactionMessage: string
+    portfolioTitle: string
+    assetTypes: Record<
+      'CDB' | 'TESOURO_DIRETO' | 'STOCK' | 'ETF' | 'CRYPTO' | 'FOREIGN_CURRENCY' | 'OTHER',
+      string
+    >
+    transactionTypes: Record<
+      'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAWAL' | 'DIVIDEND' | 'INTEREST' | 'OTHER',
+      string
+    >
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -162,6 +199,53 @@ export const translations: Record<Language, Translations> = {
       deleteTitle: 'Delete budget',
       deleteMessage: (categoryName) => `Delete the budget for "${categoryName}"?`,
     },
+    investments: {
+      title: 'Investments',
+      addInvestment: 'Add investment',
+      editInvestment: 'Edit investment',
+      name: 'Name',
+      assetType: 'Asset type',
+      institutionOptional: 'Institution (optional)',
+      currency: 'Currency',
+      currentValue: 'Current value',
+      currentValueOptional: 'Current value (optional)',
+      invested: 'Invested',
+      return: 'Return',
+      empty: 'No investments yet.',
+      loading: 'Loading investments…',
+      loadError: 'Failed to load investments.',
+      viewTransactions: 'View transactions',
+      hideTransactions: 'Hide transactions',
+      addTransaction: 'Add transaction',
+      transactionType: 'Type',
+      amount: 'Amount',
+      quantityOptional: 'Quantity (optional)',
+      date: 'Date',
+      noTransactions: 'No transactions recorded yet.',
+      deleteTitle: 'Delete investment',
+      deleteMessage: (name) => `Delete "${name}" and all its transaction history?`,
+      deleteTransactionTitle: 'Delete transaction',
+      deleteTransactionMessage: 'Delete this transaction? This cannot be undone.',
+      portfolioTitle: 'Portfolio',
+      assetTypes: {
+        CDB: 'CDB',
+        TESOURO_DIRETO: 'Tesouro Direto',
+        STOCK: 'Stock',
+        ETF: 'ETF',
+        CRYPTO: 'Crypto',
+        FOREIGN_CURRENCY: 'Foreign currency',
+        OTHER: 'Other',
+      },
+      transactionTypes: {
+        BUY: 'Buy',
+        SELL: 'Sell',
+        DEPOSIT: 'Deposit',
+        WITHDRAWAL: 'Withdrawal',
+        DIVIDEND: 'Dividend',
+        INTEREST: 'Interest',
+        OTHER: 'Other',
+      },
+    },
   },
   'pt-BR': {
     nav: {
@@ -241,6 +325,53 @@ export const translations: Record<Language, Translations> = {
       noCategoriesLeft: 'Todas as categorias de despesa já têm orçamento este mês.',
       deleteTitle: 'Excluir orçamento',
       deleteMessage: (categoryName) => `Excluir o orçamento de "${categoryName}"?`,
+    },
+    investments: {
+      title: 'Investimentos',
+      addInvestment: 'Adicionar investimento',
+      editInvestment: 'Editar investimento',
+      name: 'Nome',
+      assetType: 'Tipo de ativo',
+      institutionOptional: 'Instituição (opcional)',
+      currency: 'Moeda',
+      currentValue: 'Valor atual',
+      currentValueOptional: 'Valor atual (opcional)',
+      invested: 'Investido',
+      return: 'Retorno',
+      empty: 'Nenhum investimento ainda.',
+      loading: 'Carregando investimentos…',
+      loadError: 'Falha ao carregar investimentos.',
+      viewTransactions: 'Ver transações',
+      hideTransactions: 'Ocultar transações',
+      addTransaction: 'Adicionar transação',
+      transactionType: 'Tipo',
+      amount: 'Valor',
+      quantityOptional: 'Quantidade (opcional)',
+      date: 'Data',
+      noTransactions: 'Nenhuma transação registrada ainda.',
+      deleteTitle: 'Excluir investimento',
+      deleteMessage: (name) => `Excluir "${name}" e todo seu histórico de transações?`,
+      deleteTransactionTitle: 'Excluir transação',
+      deleteTransactionMessage: 'Excluir esta transação? Isso não pode ser desfeito.',
+      portfolioTitle: 'Carteira',
+      assetTypes: {
+        CDB: 'CDB',
+        TESOURO_DIRETO: 'Tesouro Direto',
+        STOCK: 'Ação',
+        ETF: 'ETF',
+        CRYPTO: 'Cripto',
+        FOREIGN_CURRENCY: 'Moeda estrangeira',
+        OTHER: 'Outro',
+      },
+      transactionTypes: {
+        BUY: 'Compra',
+        SELL: 'Venda',
+        DEPOSIT: 'Depósito',
+        WITHDRAWAL: 'Saque',
+        DIVIDEND: 'Dividendo',
+        INTEREST: 'Juros',
+        OTHER: 'Outro',
+      },
     },
   },
 }
