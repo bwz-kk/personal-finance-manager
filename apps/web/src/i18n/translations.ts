@@ -145,6 +145,22 @@ export interface Translations {
       string
     >
   }
+  goals: {
+    title: string
+    addGoal: string
+    editGoal: string
+    name: string
+    targetAmount: string
+    currentAmount: string
+    targetDateOptional: string
+    remaining: string
+    complete: string
+    empty: string
+    loading: string
+    loadError: string
+    deleteTitle: string
+    deleteMessage: (name: string) => string
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -302,6 +318,22 @@ export const translations: Record<Language, Translations> = {
         insufficientFunds: 'No available cash to invest this month.',
       },
     },
+    goals: {
+      title: 'Goals',
+      addGoal: 'Add goal',
+      editGoal: 'Edit goal',
+      name: 'Name',
+      targetAmount: 'Target amount',
+      currentAmount: 'Current amount',
+      targetDateOptional: 'Target date (optional)',
+      remaining: 'Remaining',
+      complete: 'Complete',
+      empty: 'No goals yet.',
+      loading: 'Loading goals…',
+      loadError: 'Failed to load goals.',
+      deleteTitle: 'Delete goal',
+      deleteMessage: (name) => `Delete "${name}"?`,
+    },
   },
   'pt-BR': {
     nav: {
@@ -456,6 +488,22 @@ export const translations: Record<Language, Translations> = {
         raisedToMinimum: 'Elevado ao investimento mínimo mensal configurado.',
         insufficientFunds: 'Sem caixa disponível para investir este mês.',
       },
+    },
+    goals: {
+      title: 'Metas',
+      addGoal: 'Adicionar meta',
+      editGoal: 'Editar meta',
+      name: 'Nome',
+      targetAmount: 'Valor alvo',
+      currentAmount: 'Valor atual',
+      targetDateOptional: 'Data alvo (opcional)',
+      remaining: 'Restante',
+      complete: 'Completa',
+      empty: 'Nenhuma meta ainda.',
+      loading: 'Carregando metas…',
+      loadError: 'Falha ao carregar metas.',
+      deleteTitle: 'Excluir meta',
+      deleteMessage: (name) => `Excluir "${name}"?`,
     },
   },
 }

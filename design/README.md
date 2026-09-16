@@ -159,7 +159,6 @@ copied byte-for-byte.
   `shadow-lg` — the whole point is a two-step ladder, not a bespoke one per
   component.
 
-
 ---
 
 ## Consuming this system (generated — do not edit)

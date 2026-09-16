@@ -1,0 +1,104 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.primary {
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.error,
+.empty {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.name {
+  font-weight: 600;
+  display: block;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cardActions button {
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 0;
+}
+
+.progressBar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.progressFillComplete {
+  height: 100%;
+  background: var(--success);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.complete {
+  color: var(--success);
+  font-weight: 600;
+}

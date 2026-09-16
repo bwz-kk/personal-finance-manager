@@ -7,13 +7,14 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 ## Status
 
 Phase 1 (Foundation), Phase 2 (Financial core), Phase 3 (Budgets),
-Phase 4 (Investments), and Phase 5 (Investment planner) are complete. The
-repo is now public on GitHub
-(https://github.com/bwz-kk/personal-finance-manager) with a `claude-design`
-branch cut off the Phase 2/3 commit for UI/visual design work, kept separate
-from ongoing backend phase work on `master`. `README.md` is still
-temporarily removed; it'll be rewritten once the core application is done —
-Phase 9.
+Phase 4 (Investments), Phase 5 (Investment planner), and Phase 6 (Goals) are
+complete. The repo is public on GitHub
+(https://github.com/bwz-kk/personal-finance-manager). A `claude-design`
+branch produced `design/README.md` (a design system derived from the app's
+real code/tokens), merged via PR #1 — further design work happens the same
+way: separate branch, PR into `master`, kept independent of ongoing backend
+phase work. `README.md` is still temporarily removed; it'll be rewritten
+once the core application is done — Phase 9.
 
 Phase 2 delivered: Category CRUD (with default seeded categories, system
 categories protected from deletion), Transaction CRUD with filtering/sorting/
@@ -78,6 +79,18 @@ page has month navigation, a live-recomputing strategy-settings panel, and
 the full explainable breakdown, verified live via Chrome (changing the
 buffer setting correctly re-capped the suggestion and updated the displayed
 reason in real time).
+
+Phase 6 delivered: `Goal` CRUD with a pure `calculateGoalProgress` domain
+function (remaining amount, progress %, complete flag — capped at 100% when
+overfunded, divide-by-zero guarded, 5 unit tests; 52-test domain suite
+passing). `currentAmountMinor` stays a plain editable field per the decision
+recorded during Phase 5 — no linked-contributions table, and goals do not
+yet factor into the planner's available-cash calculation (the spec marks
+that integration optional; it's a documented future extension, not built to
+avoid inventing an unspecified monthly-allocation model). The Goals page
+matches the spec's own example exactly (R$750/R$1,800 → R$1,050 remaining)
+and correctly caps an overfunded goal's bar at 100% with a "Complete"
+label — both verified live via Chrome.
 
 ## Project context
 
@@ -251,7 +264,7 @@ unnecessarily. Provide `.env.example` files and a correctly configured
 5. **Investment planner** — available cash calculation, investment strategy,
    suggested investment, configurable safety buffer, explanation of
    recommendation. _(Done.)_
-6. **Goals** — financial goals and progress.
+6. **Goals** — financial goals and progress. _(Done.)_
 7. **Market** — watchlist, market data provider abstraction, currency
    tracking, crypto, economic indicators.
 8. **Dashboard & analytics** — unified dashboard and useful charts.
