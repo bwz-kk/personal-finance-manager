@@ -117,6 +117,34 @@ export interface Translations {
       string
     >
   }
+  planner: {
+    title: string
+    disclaimer: string
+    income: string
+    expenses: string
+    expectedRecurring: string
+    available: string
+    suggested: string
+    remainingBuffer: string
+    loading: string
+    loadError: string
+    settings: string
+    minMonthlyInvestment: string
+    targetInvestmentRate: string
+    minCashBuffer: string
+    maxPercentOfAvailableCash: string
+    expectedRecurringExpenses: string
+    saveSettings: string
+    settingsSaved: string
+    constraints: Record<
+      | 'targetRate'
+      | 'cappedByBuffer'
+      | 'cappedByMaxPercent'
+      | 'raisedToMinimum'
+      | 'insufficientFunds',
+      string
+    >
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -246,6 +274,34 @@ export const translations: Record<Language, Translations> = {
         OTHER: 'Other',
       },
     },
+    planner: {
+      title: 'Investment Planner',
+      disclaimer:
+        'This is a configurable calculator over your own numbers, not financial advice. You can always invest a different amount than what’s suggested.',
+      income: 'Income',
+      expenses: 'Actual expenses',
+      expectedRecurring: 'Expected recurring expenses',
+      available: 'Available',
+      suggested: 'Suggested investment',
+      remainingBuffer: 'Remaining buffer',
+      loading: 'Calculating…',
+      loadError: 'Failed to load the plan.',
+      settings: 'Strategy settings',
+      minMonthlyInvestment: 'Minimum monthly investment',
+      targetInvestmentRate: 'Target investment rate (% of income)',
+      minCashBuffer: 'Minimum cash buffer',
+      maxPercentOfAvailableCash: 'Max % of available cash to invest',
+      expectedRecurringExpenses: 'Expected recurring expenses',
+      saveSettings: 'Save settings',
+      settingsSaved: 'Settings saved.',
+      constraints: {
+        targetRate: 'This matches your target investment rate.',
+        cappedByBuffer: 'Capped to protect your minimum cash buffer.',
+        cappedByMaxPercent: 'Capped by your max % of available cash.',
+        raisedToMinimum: 'Raised to your configured minimum monthly investment.',
+        insufficientFunds: 'No available cash to invest this month.',
+      },
+    },
   },
   'pt-BR': {
     nav: {
@@ -371,6 +427,34 @@ export const translations: Record<Language, Translations> = {
         DIVIDEND: 'Dividendo',
         INTEREST: 'Juros',
         OTHER: 'Outro',
+      },
+    },
+    planner: {
+      title: 'Planejador de Investimentos',
+      disclaimer:
+        'Isso é uma calculadora configurável sobre seus próprios números, não é aconselhamento financeiro. Você sempre pode investir um valor diferente do sugerido.',
+      income: 'Receitas',
+      expenses: 'Despesas reais',
+      expectedRecurring: 'Despesas recorrentes esperadas',
+      available: 'Disponível',
+      suggested: 'Investimento sugerido',
+      remainingBuffer: 'Reserva restante',
+      loading: 'Calculando…',
+      loadError: 'Falha ao carregar o planejamento.',
+      settings: 'Configurações da estratégia',
+      minMonthlyInvestment: 'Investimento mínimo mensal',
+      targetInvestmentRate: 'Taxa de investimento alvo (% da receita)',
+      minCashBuffer: 'Reserva mínima de caixa',
+      maxPercentOfAvailableCash: '% máx. do disponível a investir',
+      expectedRecurringExpenses: 'Despesas recorrentes esperadas',
+      saveSettings: 'Salvar configurações',
+      settingsSaved: 'Configurações salvas.',
+      constraints: {
+        targetRate: 'Isso corresponde à sua taxa de investimento alvo.',
+        cappedByBuffer: 'Limitado para proteger sua reserva mínima de caixa.',
+        cappedByMaxPercent: 'Limitado pela sua % máxima do disponível.',
+        raisedToMinimum: 'Elevado ao investimento mínimo mensal configurado.',
+        insufficientFunds: 'Sem caixa disponível para investir este mês.',
       },
     },
   },

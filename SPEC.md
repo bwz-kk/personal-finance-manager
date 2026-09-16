@@ -6,8 +6,9 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 ## Status
 
-Phase 1 (Foundation), Phase 2 (Financial core), Phase 3 (Budgets), and
-Phase 4 (Investments) are complete. The repo is now public on GitHub
+Phase 1 (Foundation), Phase 2 (Financial core), Phase 3 (Budgets),
+Phase 4 (Investments), and Phase 5 (Investment planner) are complete. The
+repo is now public on GitHub
 (https://github.com/bwz-kk/personal-finance-manager) with a `claude-design`
 branch cut off the Phase 2/3 commit for UI/visual design work, kept separate
 from ongoing backend phase work on `master`. `README.md` is still
@@ -59,6 +60,24 @@ re-adding). The Investments page has portfolio-by-currency summary cards,
 per-investment cards with expandable transaction history, and add/edit/delete
 for both — verified live via Chrome including a real two-currency portfolio
 (BRL + USD, confirmed never mixed).
+
+Phase 5 delivered: `calculateInvestmentPlan`, the app's most important
+calculation per this spec — given actual month income/expenses (reusing
+`calculateBalance` and `monthDateRange`, no duplicated logic) and the
+singleton `InvestmentPlanConfig`, it derives a suggested investment amount
+that's the most restrictive of three caps (target-investment-rate, minimum-
+cash-buffer, max-%-of-available-cash), then raises to a configured minimum
+only if the buffer leaves room for it. Every result reports a
+`bindingConstraint` so the suggestion is always explainable, never presented
+as advice (explicit disclaimer in the UI), and the user can freely invest a
+different amount (nothing blocks entering any amount when actually recording
+an `InvestmentTransaction`). 13 dedicated domain tests — including one that
+caught a real mislabeling bug in the buffer-vs-minimum tie-breaking logic
+before it shipped — plus the full 47-test domain suite passing. The Planner
+page has month navigation, a live-recomputing strategy-settings panel, and
+the full explainable breakdown, verified live via Chrome (changing the
+buffer setting correctly re-capped the suggestion and updated the displayed
+reason in real time).
 
 ## Project context
 
@@ -231,7 +250,7 @@ unnecessarily. Provide `.env.example` files and a correctly configured
    calculations. _(Done.)_
 5. **Investment planner** — available cash calculation, investment strategy,
    suggested investment, configurable safety buffer, explanation of
-   recommendation.
+   recommendation. _(Done.)_
 6. **Goals** — financial goals and progress.
 7. **Market** — watchlist, market data provider abstraction, currency
    tracking, crypto, economic indicators.

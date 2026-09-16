@@ -5,11 +5,12 @@ import {
   createBudgetSchema,
   updateBudgetSchema,
 } from '../validation/budget.js'
+import { currentMonth } from '../domain/dateRange.js'
 import * as budgetService from '../services/budgets/budgetService.js'
 
 export async function list(req: Request, res: Response) {
   const query = budgetQuerySchema.parse(req.query)
-  const month = query.month ?? budgetService.currentMonth()
+  const month = query.month ?? currentMonth()
   const budgets = await budgetService.listBudgets(month)
   res.json(budgets)
 }

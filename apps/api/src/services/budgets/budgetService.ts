@@ -5,10 +5,6 @@ import { AppError } from '../../middleware/errorHandler.js'
 import { prisma } from '../../lib/prisma.js'
 import type { CreateBudgetInput, UpdateBudgetInput } from '../../validation/budget.js'
 
-export function currentMonth(): string {
-  return new Date().toISOString().slice(0, 7)
-}
-
 async function spentMinorForCategory(categoryId: string, month: string): Promise<number> {
   const { start, end } = monthDateRange(month)
   const result = await prisma.transaction.aggregate({

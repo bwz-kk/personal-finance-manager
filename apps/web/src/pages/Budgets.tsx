@@ -6,18 +6,9 @@ import { Modal } from '../components/Modal'
 import { useCategories } from '../hooks/useCategories'
 import { useBudgets, useCreateBudget, useDeleteBudget, useUpdateBudget } from '../hooks/useBudgets'
 import { useLanguage } from '../i18n/LanguageContext'
+import { currentMonth, shiftMonth } from '../utils/month'
 import type { Budget } from '../api/budgets'
 import styles from './Budgets.module.css'
-
-function currentMonth(): string {
-  return new Date().toISOString().slice(0, 7)
-}
-
-function shiftMonth(month: string, delta: number): string {
-  const [year, monthNum] = month.split('-').map(Number)
-  const date = new Date(Date.UTC(year, monthNum - 1 + delta, 1))
-  return date.toISOString().slice(0, 7)
-}
 
 export function BudgetsPage() {
   const { t } = useLanguage()

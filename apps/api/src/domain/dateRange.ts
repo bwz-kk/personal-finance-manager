@@ -1,3 +1,8 @@
+/** The current month as "YYYY-MM", in UTC. */
+export function currentMonth(): string {
+  return new Date().toISOString().slice(0, 7)
+}
+
 /** "YYYY-MM" -> the exclusive [start, end) Date range covering that month, in UTC. */
 export function monthDateRange(month: string): { start: Date; end: Date } {
   const match = /^(\d{4})-(\d{2})$/.exec(month)

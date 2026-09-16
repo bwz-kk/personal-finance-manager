@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { budgetRouter } from './budgets.js'
 import { categoryRouter } from './categories.js'
 import { investmentRouter } from './investments.js'
+import { plannerRouter } from './planner.js'
 import { transactionRouter } from './transactions.js'
 import { asyncHandler } from '../middleware/asyncHandler.js'
 import { getPortfolio } from '../services/investments/portfolioService.js'
@@ -16,6 +17,7 @@ router.use('/categories', categoryRouter)
 router.use('/transactions', transactionRouter)
 router.use('/budgets', budgetRouter)
 router.use('/investments', investmentRouter)
+router.use('/planner', plannerRouter)
 
 router.get(
   '/portfolio',
