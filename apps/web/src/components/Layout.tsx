@@ -1,23 +1,26 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { LANGUAGES, useLanguage } from '../i18n/LanguageContext'
 import styles from './Layout.module.css'
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', end: true },
-  { to: '/transactions', label: 'Transactions' },
-  { to: '/budgets', label: 'Budgets' },
-  { to: '/investments', label: 'Investments' },
-  { to: '/planner', label: 'Planner' },
-  { to: '/goals', label: 'Goals' },
-  { to: '/market', label: 'Market' },
-]
-
 export function Layout() {
+  const { language, setLanguage, t } = useLanguage()
+
+  const navItems = [
+    { to: '/', label: t.nav.dashboard, end: true },
+    { to: '/transactions', label: t.nav.transactions },
+    { to: '/budgets', label: t.nav.budgets },
+    { to: '/investments', label: t.nav.investments },
+    { to: '/planner', label: t.nav.planner },
+    { to: '/goals', label: t.nav.goals },
+    { to: '/market', label: t.nav.market },
+  ]
+
   return (
     <div className={styles.shell}>
       <nav className={styles.nav}>
         <div className={styles.brand}>Personal Finance</div>
         <ul className={styles.navList}>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
@@ -31,6 +34,18 @@ export function Layout() {
             </li>
           ))}
         </ul>
+        <div className={styles.languageSwitch}>
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              className={lang === language ? styles.langActive : styles.langButton}
+              onClick={() => setLanguage(lang)}
+            >
+              {lang === 'en' ? 'EN' : 'PT-BR'}
+            </button>
+          ))}
+        </div>
       </nav>
       <main className={styles.content}>
         <Outlet />

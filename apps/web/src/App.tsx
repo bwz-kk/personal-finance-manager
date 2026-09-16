@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { LanguageProvider } from './i18n/LanguageContext'
 import { Layout } from './components/Layout'
 import { DashboardPage } from './pages/Dashboard'
 import { TransactionsPage } from './pages/Transactions'
@@ -14,19 +15,21 @@ const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="transactions" element={<TransactionsPage />} />
-            <Route path="budgets" element={<BudgetsPage />} />
-            <Route path="investments" element={<InvestmentsPage />} />
-            <Route path="planner" element={<PlannerPage />} />
-            <Route path="goals" element={<GoalsPage />} />
-            <Route path="market" element={<MarketPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <LanguageProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="transactions" element={<TransactionsPage />} />
+              <Route path="budgets" element={<BudgetsPage />} />
+              <Route path="investments" element={<InvestmentsPage />} />
+              <Route path="planner" element={<PlannerPage />} />
+              <Route path="goals" element={<GoalsPage />} />
+              <Route path="market" element={<MarketPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
     </QueryClientProvider>
   )
 }

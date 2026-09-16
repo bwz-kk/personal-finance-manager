@@ -34,3 +34,15 @@ export type WatchlistAssetClass = (typeof WATCHLIST_ASSET_CLASSES)[number]
 export function formatMinorUnits(minor: number, currency = 'BRL'): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(minor / 100)
 }
+
+/** Unit conversion for form inputs (not a financial calculation): a decimal
+ * string like "10.5" from a number input to integer minor units (1050). */
+export function decimalInputToMinorUnits(value: string): number {
+  return Math.round(Number.parseFloat(value) * 100)
+}
+
+/** The inverse: integer minor units back to a decimal string for prefilling
+ * a form input, e.g. 1050 -> "10.50". */
+export function minorUnitsToDecimalInput(minor: number): string {
+  return (minor / 100).toFixed(2)
+}

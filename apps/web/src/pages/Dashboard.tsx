@@ -1,8 +1,11 @@
+import { useLanguage } from '../i18n/LanguageContext'
+
 export function DashboardPage() {
+  const { t } = useLanguage()
   return (
     <div>
-      <h1>Dashboard</h1>
-      <p>Coming in a later phase.</p>
+      <h1>{t.nav.dashboard}</h1>
+      <p>{t.common.comingSoon}</p>
     </div>
   )
 }

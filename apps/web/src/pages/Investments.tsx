@@ -1,8 +1,11 @@
+import { useLanguage } from '../i18n/LanguageContext'
+
 export function InvestmentsPage() {
+  const { t } = useLanguage()
   return (
     <div>
-      <h1>Investments</h1>
-      <p>Coming in a later phase.</p>
+      <h1>{t.nav.investments}</h1>
+      <p>{t.common.comingSoon}</p>
     </div>
   )
 }
