@@ -137,6 +137,13 @@ Follow the phased plan in `SPEC.md`. Do not attempt to build the entire
 application in one step, and do not move to the next phase while the current
 phase has obviously broken functionality.
 
+Each phase in `SPEC.md`'s phased implementation plan is a milestone. When
+starting work on a new phase, create a new branch for it first (e.g.
+`phase-7-market`) rather than committing directly to `master`. Open a PR into
+`master` when the phase is complete and verified, the same way the
+`claude-design` branch was merged via PR #1. Don't start a phase's work
+un-branched, and don't mix work from two phases on one branch.
+
 ## Important constraints — do NOT
 
 - Build authentication without a concrete reason.
