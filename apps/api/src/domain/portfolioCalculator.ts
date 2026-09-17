@@ -16,8 +16,8 @@ export interface InvestmentSummary {
 // BUY/DEPOSIT add cash and (usually) units; SELL/WITHDRAWAL remove them.
 // DIVIDEND/INTEREST/OTHER are informational history, not principal — they
 // don't move the invested total or the held quantity.
-const CONTRIBUTION_TYPES: InvestmentTransactionType[] = ['BUY', 'DEPOSIT']
-const WITHDRAWAL_TYPES: InvestmentTransactionType[] = ['SELL', 'WITHDRAWAL']
+export const CONTRIBUTION_TYPES: InvestmentTransactionType[] = ['BUY', 'DEPOSIT']
+export const WITHDRAWAL_TYPES: InvestmentTransactionType[] = ['SELL', 'WITHDRAWAL']
 
 export function summarizeInvestmentTransactions(
   transactions: InvestmentTransactionLike[],
