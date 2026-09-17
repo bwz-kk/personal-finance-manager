@@ -6,85 +6,89 @@ for technical rationale see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Current state
 
-`master` at `54476ee` (+ nothing pending). Phases 1–8 complete and merged.
-No open PRs. Repo: https://github.com/bwz-kk/personal-finance-manager.
+`phase-9-polish` pushed, PR #4 open into `master`
+(https://github.com/bwz-kk/personal-finance-manager/pull/4), not yet merged.
+`master` itself is still at `54476ee` (Phases 1–8, unchanged this session).
+
+All six Phase 9 (Polish) items from SPEC.md are done on that branch: error
+handling, accessibility, frontend testing, a performance audit, developer
+experience, and documentation (including `README.md`, which had been
+intentionally absent until now, and a new MIT `LICENSE`). Once PR #4 merges,
+Phase 9 — and the whole phased plan — is complete.
 
 Local branches `phase-7-market`, `phase-8-dashboard`, `claude-design`, and
-`worktree-agent-ac0a8777fe7cfb61d` are all fully merged and safe to delete
-locally (`git branch -d <name>`) — left as-is, not deleted, since nobody
-asked for that cleanup.
+`worktree-agent-ac0a8777fe7cfb61d` are still fully merged and safe to delete
+(`git branch -d <name>`) — still left as-is, nobody's asked for that cleanup
+yet.
 
-Remaining phase: **9 (Polish)** — not started. `README.md` is still
-intentionally absent; it gets written in Phase 9 once the app is otherwise
-done (see SPEC.md's Status section for why).
+## Key decisions made this session (Phase 9)
 
-## Key decisions made this session
+**Error handling**: every page already had its own loading/error/empty state
+via React Query — that part of "error handling" was already solid. The
+actual gap was a render-time crash (a component throwing) having nothing to
+catch it. Added one root `ErrorBoundary` (class component under a thin
+functional wrapper for i18n/hooks access) wrapping the router `Outlet` in
+`Layout.tsx`, keyed by `location.pathname` so navigating away resets it —
+nav and the language switcher survive a crash on one page.
 
-**Workflow**: each phase in SPEC.md's phased plan is its own milestone —
-own branch (`phase-N-<slug>`), PR into `master`, merged after review.
-Decided partway through (after Phases 1–6 had already gone straight to
-`master`); documented in CLAUDE.md's "Development process" section.
-Phases 7 and 8 followed it (PRs #2, #3).
+**Accessibility**: `Modal` and `ConfirmDialog` are the two components every
+add/edit/delete flow routes through (5+ pages). Neither managed focus at
+all. Added a shared `apps/web/src/hooks/useDialogA11y.ts`: focuses the first
+focusable element on mount, restores focus to whatever was focused before on
+unmount, Escape calls the dismiss callback. Relies on both components only
+ever being conditionally rendered (mount = open, unmount = close) — if either
+ever switches to an always-rendered+hidden pattern, this hook needs an
+`isOpen` param instead. Existing forms/icon-only controls already had good
+`<label>`/`aria-label` coverage — no gap there.
 
-**Money precision**: integer minor units for currency (`amountMinor`), but
-**decimal strings** — not Prisma's `Decimal` type — for fractional
-quantities (crypto amounts, share counts). SQLite silently loses precision
-past ~15 significant digits under Prisma's `Decimal`; decimal strings
-parsed with `decimal.js` in the domain layer avoid that entirely. See
-`docs/ARCHITECTURE.md`.
+**Frontend test infra**: `apps/web` had a `test` script but no jsdom, no
+React Testing Library, 0 tests. Added them — but discovered vitest bundles
+its **own** Vite (7.3.6) that's type-incompatible under `tsc -b` with this
+repo's root Vite (8.3.0, rolldown-vite) when the `test` config field is
+merged into the same `vite.config.ts` object (Plugin type mismatch between
+the two nested Vite installs). Fixed by keeping `test` config in a
+**separate** `apps/web/vitest.config.ts` instead — no `react()`/`tailwindcss()`
+plugins needed there since Vite's core esbuild transform already handles
+`.tsx` (tsconfig has `"jsx": "react-jsx"`) and CSS Modules without them.
+`packages/shared` had no test script at all despite owning
+`formatMinorUnits`/`decimalInputToMinorUnits`/`minorUnitsToDecimalInput` —
+the round-trip conversions every money input form depends on — gave it one.
+Root `npm test` now runs `packages/shared` → `apps/api` → `apps/web` in
+sequence (87 tests total: 12 + 64 + 11).
 
-**i18n**: a from-scratch typed dictionary + React context
-(`apps/web/src/i18n`), English default with a pt-BR toggle persisted to
-`localStorage` — no library. Money formatting stays pt-BR/BRL regardless of
-interface language (the app's financial data is BRL-centric).
+**Performance**: audited for N+1 queries (found one — `budgetService.ts`
+runs one `aggregate` per budget row via `Promise.all` — but against local
+SQLite with realistically-few budget rows per month, it's not a measurable
+problem), unbounded queries, and bundle size (764KB / 220KB gzip, single
+chunk — normal for a single-user local app opened by one person, not
+internet-facing at scale). Deliberately did **not** add code-splitting or
+query batching — no evidence either would produce a user-visible
+improvement at this app's actual scale. Documented the audit rather than
+manufacturing speculative work.
 
-**Market data providers** (Phase 7): CoinGecko (crypto), open.er-api.com
-(currency — not exchangerate.host, which now requires a key), brapi.dev (BR
-stocks only, no international coverage), Banco Central do Brasil SGS API
-(SELIC/CDI/IPCA). All no-key, all through one `fetchWithTimeout` (8s).
-Known accepted quirk: BCB's daily-lag publishing means indicators read
-"stale" against the fixed 24h threshold almost immediately after a
-successful refresh — not a bug, not fixed (YAGNI on a per-class threshold).
+**Dev experience**: env vars were already well-documented via
+`.env.example` in both apps — nothing to add there. The actual gap was no
+Node version pin (`.nvmrc` + `engines`), added with a floor of 22 to match
+`apps/api`'s existing `@types/node` lower bound.
 
-**Frontend styling** (this session, user-directed): added Tailwind CSS v4 +
-shadcn/ui to `apps/web` **alongside** the CSS Modules every existing page
-still uses — not a migration. shadcn's own design tokens live in
-`index.css` under a `--sc-` prefix specifically so they can never collide
-with this app's pre-existing `--bg`/`--accent`/`--border`/etc. tokens
-(the shadcn init CLI's default merge tried to silently overwrite `--accent`
-and `--border` with its own generic values — caught and fixed before
-commit). New components go under `apps/web/src/components/ui`; the `@/`
-path alias is configured in **both** `tsconfig.json` and
-`tsconfig.app.json` (shadcn's CLI reads the former directly in this
-monorepo layout, not the latter via `references`) — a real CLI quirk hit
-during setup, worth remembering if `shadcn add` starts writing files to a
-literal `apps/web/@/` folder again.
-
-**Claude Design**: a separate `claude-design` branch (merged, PR #1)
-produced `design/README.md` — a design system derived from the app's real
-code/tokens, for UI/visual design work. Future design work should follow
-the same pattern: its own branch, PR into `master`, independent of backend
-phase work.
+**License**: repo had none; asked the user, added MIT (`LICENSE` +
+`"license": "MIT"` in root `package.json`). The repo was already public on
+GitHub before this session.
 
 ## Things caught by review this session (already fixed)
 
-- `marketService.ts`'s `refreshItem` originally caught both the provider
-  fetch AND the `MarketPriceCache` DB write in one try/catch, silently
-  treating a real DB error as "provider is down." Fixed to only catch the
-  provider fetch.
-- `investmentPlanner.ts`'s buffer-vs-minimum tie-breaking mislabeled its
-  own `bindingConstraint` in one edge case — caught by its own unit test
-  before shipping.
-- `button.tsx` (shadcn-generated) imported `cn` from the raw `cn` npm
-  package instead of `@/lib/utils` like every other component — cosmetic
-  but inconsistent; fixed.
+- Nothing caught by a review pass this session — Phase 9 work was
+  incremental, verified (typecheck/lint/format/test + live Chrome checks)
+  after each item rather than reviewed in bulk at the end.
 
 ## Verification baseline
 
-Everything in `master` passes `npm run typecheck && npm run lint && npm run
-test && npm run format:check` (64 domain tests as of Phase 8, 10 suites). Every phase
-was also verified live — either via the Chrome browser tool or, on the one
-session where the extension was disconnected, by cross-checking curl
-responses against the compiled Vite module graph. `docs/ARCHITECTURE.md`
-and `SPEC.md`'s per-phase entries have the specifics for each phase if you
-need to know exactly what was checked and how.
+Everything on `phase-9-polish` passes `npm run typecheck && npm run lint &&
+npm run test && npm run format:check` — 87 tests across 3 workspaces (12
+`packages/shared`, 64 `apps/api`, 11 `apps/web` — the last two new this
+session). `apps/web`'s production build (`npm run build`) also verified
+clean. Live-verified in Chrome: forced a render crash on the Goals page to
+confirm the `ErrorBoundary` fallback (both languages) and that navigating
+away and back recovers cleanly; confirmed `Modal` autofocus (typed into the
+first field without clicking it) and Escape-to-close on the Goals "Add"
+dialog.
