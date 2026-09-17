@@ -29,6 +29,14 @@
   height: 1.75rem;
   cursor: pointer;
   font-size: 1rem;
+  transition:
+    background-color var(--motion-standard),
+    border-color var(--motion-standard);
+}
+
+.monthNav button:hover {
+  background: var(--border);
+  border-color: var(--accent);
 }
 
 .error,
@@ -48,12 +56,14 @@
 }
 
 .statCard {
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .statLabel {
@@ -87,9 +97,11 @@
 }
 
 .chartCard {
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .chartCard h2 {
@@ -114,9 +126,11 @@
 }
 
 .listCard {
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .listCard h2 {
