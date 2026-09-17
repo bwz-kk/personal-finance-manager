@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { LANGUAGES, useLanguage } from '../i18n/LanguageContext'
+import { ErrorBoundary } from './ErrorBoundary'
 import styles from './Layout.module.css'
 
 export function Layout() {
@@ -48,7 +49,9 @@ export function Layout() {
         </div>
       </nav>
       <main className={styles.content}>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   )
