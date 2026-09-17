@@ -116,11 +116,11 @@ a ~1-day lag, so SELIC/CDI/IPCA read as "stale" against the fixed 24h
 threshold almost immediately after a successful refresh — accepted as-is
 rather than adding a per-asset-class threshold (YAGNI). International
 stocks are not covered (brapi.dev is BR-only) — a documented limitation, not
-an oversight. The Market page's frontend was verified by compiling cleanly
-through the dev server's module graph and cross-checking its API calls
-against live `curl` responses; the Chrome browser tool was unavailable this
-session (extension disconnected) so it was not visually clicked through —
-worth a manual look next session.
+an oversight. The Market page's frontend was verified live via Chrome
+(extension reconnected in a follow-up session): add-item form, a real
+CoinGecko refresh that changed both price and timestamp on click,
+refresh-all, delete with confirmation, and the empty state — all correct,
+no console errors.
 
 ## Project context
 
