@@ -47,4 +47,22 @@ describe('Modal', () => {
     await user.keyboard('{Escape}')
     expect(openButton).toHaveFocus()
   })
+
+  it('traps Tab: forward from the last element wraps to the first', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    await user.click(screen.getByText('Open'))
+    screen.getByText('Second field').focus()
+    await user.tab()
+    expect(screen.getByLabelText('First field')).toHaveFocus()
+  })
+
+  it('traps Tab: shift+Tab from the first element wraps to the last', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    await user.click(screen.getByText('Open'))
+    expect(screen.getByLabelText('First field')).toHaveFocus()
+    await user.tab({ shift: true })
+    expect(screen.getByText('Second field')).toHaveFocus()
+  })
 })
