@@ -161,6 +161,26 @@ export interface Translations {
     deleteTitle: string
     deleteMessage: (name: string) => string
   }
+  market: {
+    title: string
+    addItem: string
+    symbol: string
+    label: string
+    assetClass: string
+    baseCurrencyOptional: string
+    price: string
+    lastUpdated: string
+    stale: string
+    noPriceYet: string
+    refresh: string
+    refreshAll: string
+    empty: string
+    loading: string
+    loadError: string
+    deleteTitle: string
+    deleteMessage: (label: string) => string
+    assetClasses: Record<'CURRENCY' | 'CRYPTO' | 'STOCK' | 'INDICATOR', string>
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -334,6 +354,31 @@ export const translations: Record<Language, Translations> = {
       deleteTitle: 'Delete goal',
       deleteMessage: (name) => `Delete "${name}"?`,
     },
+    market: {
+      title: 'Market',
+      addItem: 'Add to watchlist',
+      symbol: 'Symbol',
+      label: 'Label',
+      assetClass: 'Asset class',
+      baseCurrencyOptional: 'Base currency (optional, default BRL)',
+      price: 'Price',
+      lastUpdated: 'Last updated',
+      stale: 'Stale',
+      noPriceYet: 'No price fetched yet',
+      refresh: 'Refresh',
+      refreshAll: 'Refresh all',
+      empty: 'Your watchlist is empty.',
+      loading: 'Loading watchlist…',
+      loadError: 'Failed to load the watchlist.',
+      deleteTitle: 'Remove from watchlist',
+      deleteMessage: (label) => `Remove "${label}" from the watchlist?`,
+      assetClasses: {
+        CURRENCY: 'Currency',
+        CRYPTO: 'Crypto',
+        STOCK: 'Stock',
+        INDICATOR: 'Indicator',
+      },
+    },
   },
   'pt-BR': {
     nav: {
@@ -504,6 +549,31 @@ export const translations: Record<Language, Translations> = {
       loadError: 'Falha ao carregar metas.',
       deleteTitle: 'Excluir meta',
       deleteMessage: (name) => `Excluir "${name}"?`,
+    },
+    market: {
+      title: 'Mercado',
+      addItem: 'Adicionar à lista de observação',
+      symbol: 'Símbolo',
+      label: 'Rótulo',
+      assetClass: 'Tipo de ativo',
+      baseCurrencyOptional: 'Moeda base (opcional, padrão BRL)',
+      price: 'Preço',
+      lastUpdated: 'Última atualização',
+      stale: 'Desatualizado',
+      noPriceYet: 'Nenhum preço buscado ainda',
+      refresh: 'Atualizar',
+      refreshAll: 'Atualizar tudo',
+      empty: 'Sua lista de observação está vazia.',
+      loading: 'Carregando lista de observação…',
+      loadError: 'Falha ao carregar a lista de observação.',
+      deleteTitle: 'Remover da lista de observação',
+      deleteMessage: (label) => `Remover "${label}" da lista de observação?`,
+      assetClasses: {
+        CURRENCY: 'Moeda',
+        CRYPTO: 'Cripto',
+        STOCK: 'Ação',
+        INDICATOR: 'Indicador',
+      },
     },
   },
 }
