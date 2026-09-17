@@ -19,6 +19,11 @@ export interface Translations {
     add: string
     comingSoon: string
   }
+  errorBoundary: {
+    title: string
+    message: string
+    reload: string
+  }
   transactions: {
     title: string
     addTransaction: string
@@ -225,6 +230,11 @@ export const translations: Record<Language, Translations> = {
       save: 'Save',
       add: 'Add',
       comingSoon: 'Coming in a later phase.',
+    },
+    errorBoundary: {
+      title: 'Something went wrong',
+      message: 'This page hit an unexpected error. Your data is safe — try reloading.',
+      reload: 'Reload page',
     },
     transactions: {
       title: 'Transactions',
@@ -446,6 +456,12 @@ export const translations: Record<Language, Translations> = {
       save: 'Salvar',
       add: 'Adicionar',
       comingSoon: 'Disponível em uma fase futura.',
+    },
+    errorBoundary: {
+      title: 'Algo deu errado',
+      message:
+        'Esta página encontrou um erro inesperado. Seus dados estão seguros — tente recarregar.',
+      reload: 'Recarregar página',
     },
     transactions: {
       title: 'Transações',
