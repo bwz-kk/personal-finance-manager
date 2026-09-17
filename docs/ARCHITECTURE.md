@@ -76,6 +76,19 @@ database schema and the rest of the app are unaffected. `MarketPriceCache` is
 what keeps a provider outage from becoming an application error: local
 financial data is never blocked on a third-party API being up.
 
+Concrete providers, one per `WatchlistAssetClass`, all free and requiring no
+API key:
+
+| Asset class | Provider                        | Notes                                                                                                                                                                                                                                               |
+| ----------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CRYPTO`    | CoinGecko `simple/price`        | Ticker→id map for common coins (BTC, ETH, …); unmapped symbols fall back to the lowercased input, which works if the CoinGecko id is entered directly.                                                                                              |
+| `CURRENCY`  | open.er-api.com                 | Not exchangerate.host — that provider now requires a key despite older guidance calling it free.                                                                                                                                                    |
+| `STOCK`     | brapi.dev                       | Brazilian (B3) stocks only; a handful of common tickers work unauthenticated without limits, others may be rate-limited. International stocks are not covered — a documented gap, not an oversight.                                                 |
+| `INDICATOR` | Banco Central do Brasil SGS API | SELIC (series 11), CDI (series 12), IPCA (series 433). BCB publishes daily-series data with roughly a one-day lag, so these will often read as "stale" against the fixed 24h threshold even right after a successful refresh — expected, not a bug. |
+
+Every provider call goes through a shared `fetchWithTimeout` (8s) so a hung
+request degrades to a failure like any other rather than hanging the app.
+
 ## Currency handling
 
 Cash transactions (`Transaction`, `Budget`, `Goal`) assume a single base

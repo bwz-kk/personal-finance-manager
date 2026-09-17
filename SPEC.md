@@ -6,15 +6,18 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 ## Status
 
-Phase 1 (Foundation), Phase 2 (Financial core), Phase 3 (Budgets),
-Phase 4 (Investments), Phase 5 (Investment planner), and Phase 6 (Goals) are
-complete. The repo is public on GitHub
+Phase 1 (Foundation) through Phase 6 (Goals) are complete and merged to
+`master`. Phase 7 (Market) is implemented on branch `phase-7-market`,
+pending PR review. The repo is public on GitHub
 (https://github.com/bwz-kk/personal-finance-manager). A `claude-design`
 branch produced `design/README.md` (a design system derived from the app's
-real code/tokens), merged via PR #1 — further design work happens the same
-way: separate branch, PR into `master`, kept independent of ongoing backend
-phase work. `README.md` is still temporarily removed; it'll be rewritten
-once the core application is done — Phase 9.
+real code/tokens), merged via PR #1. `README.md` is still temporarily
+removed; it'll be rewritten once the core application is done — Phase 9.
+
+Starting with Phase 7, each phase in the phased implementation plan below is
+its own milestone: it gets its own branch (named `phase-N-<slug>`) and merges
+into `master` via PR when complete and verified, rather than committing
+directly to `master` — see `CLAUDE.md`'s "Development process" section.
 
 Phase 2 delivered: Category CRUD (with default seeded categories, system
 categories protected from deletion), Transaction CRUD with filtering/sorting/
@@ -91,6 +94,33 @@ avoid inventing an unspecified monthly-allocation model). The Goals page
 matches the spec's own example exactly (R$750/R$1,800 → R$1,050 remaining)
 and correctly caps an overfunded goal's bar at 100% with a "Complete"
 label — both verified live via Chrome.
+
+Phase 7 delivered: the `MarketDataProvider` interface
+(`apps/api/src/services/market/types.ts`) plus four concrete providers, one
+per `WatchlistAssetClass` — CoinGecko (crypto), open.er-api.com (currency;
+not exchangerate.host, which now requires a key), brapi.dev (BR stocks), and
+the Banco Central do Brasil SGS API (SELIC/CDI/IPCA indicators) — all no-key,
+all going through a shared `fetchWithTimeout` (8s) so a hung request can
+never hang the app. A pure `isPriceStale` domain function (6 unit tests,
+including the future-asOf clock-skew case) flags a cached price as possibly
+outdated; the service layer never throws on a provider failure — it falls
+back to `MarketPriceCache` and marks the result stale, and a `refresh-all`
+batch never fails over one bad symbol (58-test domain suite passing).
+`GET /api/market/watchlist` never makes a live call — it only reads the
+cache, so viewing the watchlist works offline; refreshing is an explicit,
+separate action (`POST .../refresh` or `.../refresh-all`). All four
+providers were verified against their real, live APIs (not mocked) during
+development — BTC/BRL, USD/BRL, SELIC and PETR4 all returned real current
+values. One honest quirk, not a bug: BCB publishes daily indicator data with
+a ~1-day lag, so SELIC/CDI/IPCA read as "stale" against the fixed 24h
+threshold almost immediately after a successful refresh — accepted as-is
+rather than adding a per-asset-class threshold (YAGNI). International
+stocks are not covered (brapi.dev is BR-only) — a documented limitation, not
+an oversight. The Market page's frontend was verified by compiling cleanly
+through the dev server's module graph and cross-checking its API calls
+against live `curl` responses; the Chrome browser tool was unavailable this
+session (extension disconnected) so it was not visually clicked through —
+worth a manual look next session.
 
 ## Project context
 
@@ -266,7 +296,7 @@ unnecessarily. Provide `.env.example` files and a correctly configured
    recommendation. _(Done.)_
 6. **Goals** — financial goals and progress. _(Done.)_
 7. **Market** — watchlist, market data provider abstraction, currency
-   tracking, crypto, economic indicators.
+   tracking, crypto, economic indicators. _(Done.)_
 8. **Dashboard & analytics** — unified dashboard and useful charts.
 9. **Polish** — error handling, testing, accessibility, performance,
    documentation, developer experience, UI consistency. This is also where
