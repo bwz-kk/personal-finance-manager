@@ -64,26 +64,28 @@ export async function deleteWatchlistItem(id: string) {
   await prisma.watchlistItem.delete({ where: { id } })
 }
 
-// Never throws on a provider failure — falls back to the cache (marked
+// Never throws on a PROVIDER failure — falls back to the cache (marked
 // stale) if one exists, or to a "no price yet" result if it doesn't. This
 // is what keeps one bad symbol or a provider outage from ever corrupting
-// the app or failing a refresh-all batch over a single item.
+// the app or failing a refresh-all batch over a single item. A database
+// error from the upsert itself is a different failure mode (not "the
+// provider is down") and is intentionally left to propagate rather than
+// being silently reinterpreted as one.
 async function refreshItem(item: WatchlistItem) {
+  let result: Awaited<ReturnType<MarketDataProvider['fetchPrice']>>
   try {
-    const result = await PROVIDERS[item.assetClass].fetchPrice(
-      item.symbol,
-      item.baseCurrency ?? 'BRL',
-    )
-    const cache = await prisma.marketPriceCache.upsert({
-      where: { symbol: item.symbol },
-      create: { symbol: item.symbol, ...result },
-      update: result,
-    })
-    return withCachedPrice(item, cache)
+    result = await PROVIDERS[item.assetClass].fetchPrice(item.symbol, item.baseCurrency ?? 'BRL')
   } catch {
     const cache = await prisma.marketPriceCache.findUnique({ where: { symbol: item.symbol } })
     return withCachedPrice(item, cache ?? undefined)
   }
+
+  const cache = await prisma.marketPriceCache.upsert({
+    where: { symbol: item.symbol },
+    create: { symbol: item.symbol, ...result },
+    update: result,
+  })
+  return withCachedPrice(item, cache)
 }
 
 export async function refreshWatchlistItem(id: string) {
