@@ -17,6 +17,7 @@
   padding: 1.5rem;
   max-width: 420px;
   width: 100%;
+  box-shadow: var(--shadow-lg);
 }
 
 .panel h2 {

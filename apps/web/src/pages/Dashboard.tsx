@@ -15,6 +15,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { AnimatedNumber } from '../components/AnimatedNumber'
 import { useDashboard } from '../hooks/useDashboard'
 import { useLanguage } from '../i18n/LanguageContext'
 import { currentMonth, shiftMonth } from '../utils/month'
@@ -57,35 +58,37 @@ export function DashboardPage() {
       {data && (
         <>
           <div className={styles.statGrid}>
-            <StatCard label={t.dashboard.cashBalance} value={fmt(data.cashBalanceMinor)} />
+            <StatCard label={t.dashboard.cashBalance} valueMinor={data.cashBalanceMinor} />
             {data.portfolio.groups.map((g) => (
               <StatCard
                 key={`pv-${g.currency}`}
                 label={`${t.dashboard.portfolioValue} (${g.currency})`}
-                value={fmt(g.currentValueMinor, g.currency)}
+                valueMinor={g.currentValueMinor}
+                currency={g.currency}
               />
             ))}
             <StatCard
               label={t.dashboard.income}
-              value={fmt(data.period.incomeMinor)}
+              valueMinor={data.period.incomeMinor}
               tone="income"
             />
             <StatCard
               label={t.dashboard.expenses}
-              value={fmt(data.period.expenseMinor)}
+              valueMinor={data.period.expenseMinor}
               tone="expense"
             />
             {data.portfolio.groups.map((g) => (
               <StatCard
                 key={`inv-${g.currency}`}
                 label={`${t.dashboard.invested} (${g.currency})`}
-                value={fmt(g.totalInvestedMinor, g.currency)}
+                valueMinor={g.totalInvestedMinor}
+                currency={g.currency}
               />
             ))}
-            <StatCard label={t.dashboard.available} value={fmt(data.plan.availableMinor)} />
+            <StatCard label={t.dashboard.available} valueMinor={data.plan.availableMinor} />
             <StatCard
               label={t.dashboard.suggestedInvestment}
-              value={fmt(data.plan.suggestedMinor)}
+              valueMinor={data.plan.suggestedMinor}
               tone="accent"
             />
           </div>
@@ -280,17 +283,21 @@ export function DashboardPage() {
 
 function StatCard({
   label,
-  value,
+  valueMinor,
+  currency,
   tone,
 }: {
   label: string
-  value: string
+  valueMinor: number
+  currency?: string
   tone?: 'income' | 'expense' | 'accent'
 }) {
   return (
     <div className={styles.statCard}>
       <span className={styles.statLabel}>{label}</span>
-      <span className={tone ? styles[tone] : undefined}>{value}</span>
+      <span className={tone ? styles[tone] : undefined}>
+        <AnimatedNumber valueMinor={valueMinor} currency={currency} />
+      </span>
     </div>
   )
 }
