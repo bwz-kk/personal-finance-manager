@@ -33,8 +33,16 @@ Use the following unless there's a strong technical reason not to — and if
 you think a technology should change, explain the trade-off before making
 the architectural change:
 
-- **Frontend**: React, TypeScript, Vite, CSS Modules, React-based charts
-  (Recharts) where a visualization is genuinely useful.
+- **Frontend**: React, TypeScript, Vite, React-based charts (Recharts) where
+  a visualization is genuinely useful. Styling: Tailwind CSS v4 + shadcn/ui
+  (`apps/web/components.json`, components under `apps/web/src/components/ui`,
+  `@/` path alias) for new work, alongside the CSS Modules used by every
+  existing page — this was a deliberate switch (user-directed), not a
+  migration of existing pages. shadcn's own design tokens live in
+  `apps/web/src/index.css` under a `--sc-` prefix specifically so they never
+  collide with this app's pre-existing `--bg`/`--accent`/`--border`/etc.
+  tokens that every CSS Module still references — never rename or reuse one
+  of those pre-existing token names for a shadcn/Tailwind token.
 - **Backend**: Node.js, TypeScript, Express, REST API.
 - **Database**: SQLite via Prisma.
 - **Dev tooling**: Git, environment variables where appropriate, ESLint,
