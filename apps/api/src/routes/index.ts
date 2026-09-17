@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { budgetRouter } from './budgets.js'
 import { categoryRouter } from './categories.js'
+import { dashboardRouter } from './dashboard.js'
 import { goalRouter } from './goals.js'
 import { investmentRouter } from './investments.js'
 import { marketRouter } from './market.js'
@@ -22,6 +23,7 @@ router.use('/investments', investmentRouter)
 router.use('/planner', plannerRouter)
 router.use('/goals', goalRouter)
 router.use('/market', marketRouter)
+router.use('/dashboard', dashboardRouter)
 
 router.get(
   '/portfolio',

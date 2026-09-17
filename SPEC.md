@@ -6,9 +6,9 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 ## Status
 
-Phase 1 (Foundation) through Phase 6 (Goals) are complete and merged to
-`master`. Phase 7 (Market) is implemented on branch `phase-7-market`,
-pending PR review. The repo is public on GitHub
+Phase 1 (Foundation) through Phase 7 (Market) are complete and merged to
+`master` (PR #2). Phase 8 (Dashboard & analytics) is implemented on branch
+`phase-8-dashboard`, pending PR review. The repo is public on GitHub
 (https://github.com/bwz-kk/personal-finance-manager). A `claude-design`
 branch produced `design/README.md` (a design system derived from the app's
 real code/tokens), merged via PR #1. `README.md` is still temporarily
@@ -121,6 +121,35 @@ an oversight. The Market page's frontend was verified live via Chrome
 CoinGecko refresh that changed both price and timestamp on click,
 refresh-all, delete with confirmation, and the empty state — all correct,
 no console errors.
+
+Phase 8 delivered: a `GET /api/dashboard` endpoint that's pure composition,
+not new financial logic — it calls the existing transaction/budget/planner/
+portfolio/market services and assembles their results, per
+`docs/ARCHITECTURE.md`'s one-calculation-per-concern rule. The only real
+decision was cash balance: `calculateBalance(allTransactions)` nets against
+BRL-denominated investment contributions only (`portfolio.groups.find(g =>
+g.currency === 'BRL')`), since `Transaction` rows are BRL-only per
+`docs/ARCHITECTURE.md`'s currency handling — a USD/EUR investment's
+contributions are never subtracted from the BRL balance, which would
+silently mix currencies. Two small pure domain additions support the time-
+series charts: `trailingMonths` and `bucketMinorByMonth` (6 unit tests,
+including a month-boundary rollover and an out-of-range-entries case) — the
+6-month trend and investment-contributions charts are zero-filled for
+quiet months rather than skipping them. `CONTRIBUTION_TYPES`/
+`WITHDRAWAL_TYPES` were exported from `portfolioCalculator.ts` (previously
+module-private) so the dashboard reuses the exact same BUY/DEPOSIT-vs-SELL/
+WITHDRAWAL classification Phase 4 established, instead of redefining it.
+64-test domain suite passing. The Dashboard page shows cash balance,
+portfolio value and invested amount per currency, period income/expenses,
+available cash, and the suggested investment, plus six Recharts
+visualizations (income vs. expenses, monthly trend, spending by category,
+portfolio allocation, investment contributions) and three list panels
+(budget status, recent transactions, watchlist) — replacing the placeholder
+stub. Verified live via Chrome against realistic seeded data (multiple
+months of transactions, a budget, an investment, a watchlist item): every
+figure cross-checked against the raw API response, pt-BR toggle correctly
+translates chart labels too (they're derived from `t.dashboard.*`, not
+hardcoded), and month navigation correctly re-fetches — no console errors.
 
 ## Project context
 
@@ -298,6 +327,7 @@ unnecessarily. Provide `.env.example` files and a correctly configured
 7. **Market** — watchlist, market data provider abstraction, currency
    tracking, crypto, economic indicators. _(Done.)_
 8. **Dashboard & analytics** — unified dashboard and useful charts.
+   _(Done.)_
 9. **Polish** — error handling, testing, accessibility, performance,
    documentation, developer experience, UI consistency. This is also where
    `README.md` gets rewritten and GitHub publishing happens.

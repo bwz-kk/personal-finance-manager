@@ -181,6 +181,31 @@ export interface Translations {
     deleteMessage: (label: string) => string
     assetClasses: Record<'CURRENCY' | 'CRYPTO' | 'STOCK' | 'INDICATOR', string>
   }
+  dashboard: {
+    title: string
+    cashBalance: string
+    portfolioValue: string
+    income: string
+    expenses: string
+    invested: string
+    available: string
+    suggestedInvestment: string
+    budgetStatus: string
+    recentTransactions: string
+    watchlist: string
+    incomeVsExpenses: string
+    spendingByCategory: string
+    monthlyTrend: string
+    investmentContributions: string
+    portfolioAllocation: string
+    noBudgets: string
+    noTransactions: string
+    noWatchlist: string
+    noSpending: string
+    noInvestments: string
+    loading: string
+    loadError: string
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -379,6 +404,31 @@ export const translations: Record<Language, Translations> = {
         INDICATOR: 'Indicator',
       },
     },
+    dashboard: {
+      title: 'Dashboard',
+      cashBalance: 'Cash balance',
+      portfolioValue: 'Portfolio value',
+      income: 'Income',
+      expenses: 'Expenses',
+      invested: 'Invested',
+      available: 'Available',
+      suggestedInvestment: 'Suggested investment',
+      budgetStatus: 'Budget status',
+      recentTransactions: 'Recent transactions',
+      watchlist: 'Watchlist',
+      incomeVsExpenses: 'Income vs. expenses',
+      spendingByCategory: 'Spending by category',
+      monthlyTrend: 'Monthly trend',
+      investmentContributions: 'Investment contributions',
+      portfolioAllocation: 'Portfolio allocation',
+      noBudgets: 'No budgets set for this month.',
+      noTransactions: 'No transactions yet.',
+      noWatchlist: 'Your watchlist is empty.',
+      noSpending: 'No spending recorded this month.',
+      noInvestments: 'No investments yet.',
+      loading: 'Loading dashboard…',
+      loadError: 'Failed to load the dashboard.',
+    },
   },
   'pt-BR': {
     nav: {
@@ -574,6 +624,31 @@ export const translations: Record<Language, Translations> = {
         STOCK: 'Ação',
         INDICATOR: 'Indicador',
       },
+    },
+    dashboard: {
+      title: 'Painel',
+      cashBalance: 'Saldo em caixa',
+      portfolioValue: 'Valor da carteira',
+      income: 'Receitas',
+      expenses: 'Despesas',
+      invested: 'Investido',
+      available: 'Disponível',
+      suggestedInvestment: 'Investimento sugerido',
+      budgetStatus: 'Status dos orçamentos',
+      recentTransactions: 'Transações recentes',
+      watchlist: 'Lista de observação',
+      incomeVsExpenses: 'Receitas vs. despesas',
+      spendingByCategory: 'Gastos por categoria',
+      monthlyTrend: 'Tendência mensal',
+      investmentContributions: 'Aportes em investimentos',
+      portfolioAllocation: 'Alocação da carteira',
+      noBudgets: 'Nenhum orçamento definido para este mês.',
+      noTransactions: 'Nenhuma transação ainda.',
+      noWatchlist: 'Sua lista de observação está vazia.',
+      noSpending: 'Nenhum gasto registrado este mês.',
+      noInvestments: 'Nenhum investimento ainda.',
+      loading: 'Carregando painel…',
+      loadError: 'Falha ao carregar o painel.',
     },
   },
 }
