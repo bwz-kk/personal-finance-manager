@@ -48,11 +48,38 @@
   color: var(--danger);
 }
 
-.statGrid {
+/* One continuous bento grid — a fixed 4-column desktop layout (rather than
+ * auto-fill/auto-fit) so span2 cards compose predictably into a mosaic
+ * instead of three stacked uniform-height sections. Collapses to 2 then 1
+ * column on narrower widths. */
+.bento {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(0, auto);
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .bento {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 560px) {
+  .span2 {
+    grid-column: span 1;
+  }
 }
 
 .statCard {
@@ -62,8 +89,29 @@
   padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.3rem;
   box-shadow: var(--shadow-sm);
+}
+
+/* The one gradient-fade surface in the app, borrowed from the mobile
+ * reference's glow — a radial fade from a bright accent highlight down to
+ * the page background, rather than a flat fill. White text throughout
+ * regardless of light/dark theme, since it always sits on a saturated
+ * accent surface. */
+.hero {
+  background: radial-gradient(
+    130% 140% at 18% 12%,
+    color-mix(in srgb, var(--accent) 60%, white) 0%,
+    var(--accent) 45%,
+    color-mix(in srgb, var(--accent) 55%, black) 100%
+  );
+  border-color: transparent;
+  color: #fff;
+}
+
+.hero .statLabel {
+  color: rgb(255 255 255 / 75%);
 }
 
 .statLabel {
@@ -89,11 +137,9 @@
   font-size: 1.1rem;
 }
 
-.chartGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+.hero span:not(.statLabel) {
+  font-weight: 700;
+  font-size: 1.5rem;
 }
 
 .chartCard {
@@ -117,12 +163,6 @@
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 600;
-}
-
-.listGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
 }
 
 .listCard {
@@ -150,7 +190,7 @@
 .progressBar {
   height: 6px;
   border-radius: 3px;
-  background: var(--bg-subtle);
+  background: var(--border);
   overflow: hidden;
 }
 

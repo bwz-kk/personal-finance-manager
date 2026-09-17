@@ -56,226 +56,219 @@ export function DashboardPage() {
       {dashboardQuery.isError && <p className={styles.error}>{t.dashboard.loadError}</p>}
 
       {data && (
-        <>
-          <div className={styles.statGrid}>
-            <StatCard label={t.dashboard.cashBalance} valueMinor={data.cashBalanceMinor} />
-            {data.portfolio.groups.map((g) => (
-              <StatCard
-                key={`pv-${g.currency}`}
-                label={`${t.dashboard.portfolioValue} (${g.currency})`}
-                valueMinor={g.currentValueMinor}
-                currency={g.currency}
-              />
-            ))}
-            <StatCard
-              label={t.dashboard.income}
-              valueMinor={data.period.incomeMinor}
-              tone="income"
-            />
-            <StatCard
-              label={t.dashboard.expenses}
-              valueMinor={data.period.expenseMinor}
-              tone="expense"
-            />
-            {data.portfolio.groups.map((g) => (
-              <StatCard
-                key={`inv-${g.currency}`}
-                label={`${t.dashboard.invested} (${g.currency})`}
-                valueMinor={g.totalInvestedMinor}
-                currency={g.currency}
-              />
-            ))}
-            <StatCard label={t.dashboard.available} valueMinor={data.plan.availableMinor} />
-            <StatCard
-              label={t.dashboard.suggestedInvestment}
-              valueMinor={data.plan.suggestedMinor}
-              tone="accent"
-            />
-          </div>
+        <div className={styles.bento}>
+          <StatCard
+            label={t.dashboard.cashBalance}
+            valueMinor={data.cashBalanceMinor}
+            hero
+            span={2}
+          />
+          <StatCard label={t.dashboard.income} valueMinor={data.period.incomeMinor} tone="income" />
+          <StatCard
+            label={t.dashboard.expenses}
+            valueMinor={data.period.expenseMinor}
+            tone="expense"
+          />
 
-          <div className={styles.chartGrid}>
-            <ChartCard title={t.dashboard.incomeVsExpenses}>
+          {data.portfolio.groups.map((g) => (
+            <StatCard
+              key={`pv-${g.currency}`}
+              label={`${t.dashboard.portfolioValue} (${g.currency})`}
+              valueMinor={g.currentValueMinor}
+              currency={g.currency}
+            />
+          ))}
+          {data.portfolio.groups.map((g) => (
+            <StatCard
+              key={`inv-${g.currency}`}
+              label={`${t.dashboard.invested} (${g.currency})`}
+              valueMinor={g.totalInvestedMinor}
+              currency={g.currency}
+            />
+          ))}
+          <StatCard label={t.dashboard.available} valueMinor={data.plan.availableMinor} />
+          <StatCard
+            label={t.dashboard.suggestedInvestment}
+            valueMinor={data.plan.suggestedMinor}
+            tone="accent"
+          />
+
+          <ChartCard title={t.dashboard.incomeVsExpenses} span={2}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart
+                data={[
+                  { name: t.dashboard.income, value: data.period.incomeMinor / 100 },
+                  { name: t.dashboard.expenses, value: data.period.expenseMinor / 100 },
+                ]}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
+                <YAxis stroke="var(--text-muted)" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+                />
+                <Bar dataKey="value">
+                  <Cell fill="var(--success)" />
+                  <Cell fill="var(--danger)" />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title={t.dashboard.monthlyTrend} span={2}>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart
+                data={data.monthlyTrend.map((m) => ({
+                  month: m.month,
+                  [t.dashboard.income]: m.incomeMinor / 100,
+                  [t.dashboard.expenses]: m.expenseMinor / 100,
+                }))}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={12} />
+                <YAxis stroke="var(--text-muted)" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+                />
+                <Legend />
+                <Line type="monotone" dataKey={t.dashboard.income} stroke="var(--success)" />
+                <Line type="monotone" dataKey={t.dashboard.expenses} stroke="var(--danger)" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title={t.dashboard.spendingByCategory} span={2}>
+            {data.spendingByCategory.length === 0 ? (
+              <p className={styles.empty}>{t.dashboard.noSpending}</p>
+            ) : (
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={[
-                    { name: t.dashboard.income, value: data.period.incomeMinor / 100 },
-                    { name: t.dashboard.expenses, value: data.period.expenseMinor / 100 },
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
-                  <YAxis stroke="var(--text-muted)" fontSize={12} />
+                <PieChart>
+                  <Pie
+                    data={data.spendingByCategory.map((s) => ({
+                      name: s.categoryName,
+                      value: s.amountMinor / 100,
+                    }))}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    label
+                  >
+                    {data.spendingByCategory.map((s, i) => (
+                      <Cell key={s.categoryId} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
                   <Tooltip
                     contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
                   />
-                  <Bar dataKey="value">
-                    <Cell fill="var(--success)" />
-                    <Cell fill="var(--danger)" />
-                  </Bar>
-                </BarChart>
+                </PieChart>
               </ResponsiveContainer>
-            </ChartCard>
+            )}
+          </ChartCard>
 
-            <ChartCard title={t.dashboard.monthlyTrend}>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart
-                  data={data.monthlyTrend.map((m) => ({
-                    month: m.month,
-                    [t.dashboard.income]: m.incomeMinor / 100,
-                    [t.dashboard.expenses]: m.expenseMinor / 100,
-                  }))}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={12} />
-                  <YAxis stroke="var(--text-muted)" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey={t.dashboard.income} stroke="var(--success)" />
-                  <Line type="monotone" dataKey={t.dashboard.expenses} stroke="var(--danger)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
-            <ChartCard title={t.dashboard.spendingByCategory}>
-              {data.spendingByCategory.length === 0 ? (
-                <p className={styles.empty}>{t.dashboard.noSpending}</p>
-              ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={data.spendingByCategory.map((s) => ({
-                        name: s.categoryName,
-                        value: s.amountMinor / 100,
-                      }))}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={80}
-                      label
-                    >
-                      {data.spendingByCategory.map((s, i) => (
-                        <Cell key={s.categoryId} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
-            </ChartCard>
-
-            <ChartCard title={t.dashboard.portfolioAllocation}>
-              {data.portfolio.groups.length === 0 ? (
-                <p className={styles.empty}>{t.dashboard.noInvestments}</p>
-              ) : (
-                data.portfolio.groups.map((g) => (
-                  <div key={g.currency} className={styles.allocationGroup}>
-                    <span className={styles.allocationCurrency}>{g.currency}</span>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <PieChart>
-                        <Pie
-                          data={g.allocation.map((a) => ({
-                            name: a.name,
-                            value: a.currentValueMinor / 100,
-                          }))}
-                          dataKey="value"
-                          nameKey="name"
-                          outerRadius={70}
-                          label
-                        >
-                          {g.allocation.map((a, i) => (
-                            <Cell
-                              key={a.investmentId}
-                              fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            background: 'var(--bg)',
-                            border: '1px solid var(--border)',
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                ))
-              )}
-            </ChartCard>
-
-            <ChartCard title={t.dashboard.investmentContributions}>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={data.investmentContributionsByMonth.map((m) => ({
-                    month: m.month,
-                    value: m.netContributedMinor / 100,
-                  }))}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={12} />
-                  <YAxis stroke="var(--text-muted)" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
-                  />
-                  <Bar dataKey="value" fill="var(--accent)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
-
-          <div className={styles.listGrid}>
-            <ListCard title={t.dashboard.budgetStatus}>
-              {data.budgets.length === 0 ? (
-                <p className={styles.empty}>{t.dashboard.noBudgets}</p>
-              ) : (
-                data.budgets.map((b) => (
-                  <div key={b.id} className={styles.budgetRow}>
-                    <span>{b.category.name}</span>
-                    <div className={styles.progressBar}>
-                      <div
-                        className={b.isOverspent ? styles.progressFillOver : styles.progressFill}
-                        style={{ width: `${Math.min(b.progressPct, 100)}%` }}
+          <ChartCard title={t.dashboard.portfolioAllocation} span={2}>
+            {data.portfolio.groups.length === 0 ? (
+              <p className={styles.empty}>{t.dashboard.noInvestments}</p>
+            ) : (
+              data.portfolio.groups.map((g) => (
+                <div key={g.currency} className={styles.allocationGroup}>
+                  <span className={styles.allocationCurrency}>{g.currency}</span>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie
+                        data={g.allocation.map((a) => ({
+                          name: a.name,
+                          value: a.currentValueMinor / 100,
+                        }))}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={70}
+                        label
+                      >
+                        {g.allocation.map((a, i) => (
+                          <Cell key={a.investmentId} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          background: 'var(--bg)',
+                          border: '1px solid var(--border)',
+                        }}
                       />
-                    </div>
-                    <span className={styles.budgetPct}>{b.progressPct}%</span>
-                  </div>
-                ))
-              )}
-            </ListCard>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ))
+            )}
+          </ChartCard>
 
-            <ListCard title={t.dashboard.recentTransactions}>
-              {data.recentTransactions.length === 0 ? (
-                <p className={styles.empty}>{t.dashboard.noTransactions}</p>
-              ) : (
-                data.recentTransactions.map((tx) => (
-                  <div key={tx.id} className={styles.txRow}>
-                    <span>{tx.date.slice(0, 10)}</span>
-                    <span className={styles.txDescription}>{tx.description}</span>
-                    <span className={tx.type === 'INCOME' ? styles.income : styles.expense}>
-                      {tx.type === 'INCOME' ? '+' : '-'}
-                      {fmt(tx.amountMinor, tx.currency)}
-                    </span>
-                  </div>
-                ))
-              )}
-            </ListCard>
+          <ChartCard title={t.dashboard.investmentContributions} span={2}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart
+                data={data.investmentContributionsByMonth.map((m) => ({
+                  month: m.month,
+                  value: m.netContributedMinor / 100,
+                }))}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={12} />
+                <YAxis stroke="var(--text-muted)" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+                />
+                <Bar dataKey="value" fill="var(--accent)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
-            <ListCard title={t.dashboard.watchlist}>
-              {data.watchlist.length === 0 ? (
-                <p className={styles.empty}>{t.dashboard.noWatchlist}</p>
-              ) : (
-                data.watchlist.map((item) => (
-                  <div key={item.id} className={styles.watchRow}>
-                    <span>{item.symbol}</span>
-                    <span>{item.price ?? '—'}</span>
+          <ListCard title={t.dashboard.budgetStatus} span={2}>
+            {data.budgets.length === 0 ? (
+              <p className={styles.empty}>{t.dashboard.noBudgets}</p>
+            ) : (
+              data.budgets.map((b) => (
+                <div key={b.id} className={styles.budgetRow}>
+                  <span>{b.category.name}</span>
+                  <div className={styles.progressBar}>
+                    <div
+                      className={b.isOverspent ? styles.progressFillOver : styles.progressFill}
+                      style={{ width: `${Math.min(b.progressPct, 100)}%` }}
+                    />
                   </div>
-                ))
-              )}
-            </ListCard>
-          </div>
-        </>
+                  <span className={styles.budgetPct}>{b.progressPct}%</span>
+                </div>
+              ))
+            )}
+          </ListCard>
+
+          <ListCard title={t.dashboard.recentTransactions} span={2}>
+            {data.recentTransactions.length === 0 ? (
+              <p className={styles.empty}>{t.dashboard.noTransactions}</p>
+            ) : (
+              data.recentTransactions.map((tx) => (
+                <div key={tx.id} className={styles.txRow}>
+                  <span>{tx.date.slice(0, 10)}</span>
+                  <span className={styles.txDescription}>{tx.description}</span>
+                  <span className={tx.type === 'INCOME' ? styles.income : styles.expense}>
+                    {tx.type === 'INCOME' ? '+' : '-'}
+                    {fmt(tx.amountMinor, tx.currency)}
+                  </span>
+                </div>
+              ))
+            )}
+          </ListCard>
+
+          <ListCard title={t.dashboard.watchlist} span={2}>
+            {data.watchlist.length === 0 ? (
+              <p className={styles.empty}>{t.dashboard.noWatchlist}</p>
+            ) : (
+              data.watchlist.map((item) => (
+                <div key={item.id} className={styles.watchRow}>
+                  <span>{item.symbol}</span>
+                  <span>{item.price ?? '—'}</span>
+                </div>
+              ))
+            )}
+          </ListCard>
+        </div>
       )}
     </div>
   )
@@ -286,14 +279,21 @@ function StatCard({
   valueMinor,
   currency,
   tone,
+  hero,
+  span,
 }: {
   label: string
   valueMinor: number
   currency?: string
   tone?: 'income' | 'expense' | 'accent'
+  hero?: boolean
+  span?: 2
 }) {
+  const className = [styles.statCard, hero && styles.hero, span === 2 && styles.span2]
+    .filter(Boolean)
+    .join(' ')
   return (
-    <div className={styles.statCard}>
+    <div className={className}>
       <span className={styles.statLabel}>{label}</span>
       <span className={tone ? styles[tone] : undefined}>
         <AnimatedNumber valueMinor={valueMinor} currency={currency} />
@@ -302,18 +302,36 @@ function StatCard({
   )
 }
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ChartCard({
+  title,
+  span,
+  children,
+}: {
+  title: string
+  span?: 2
+  children: React.ReactNode
+}) {
+  const className = [styles.chartCard, span === 2 && styles.span2].filter(Boolean).join(' ')
   return (
-    <div className={styles.chartCard}>
+    <div className={className}>
       <h2>{title}</h2>
       {children}
     </div>
   )
 }
 
-function ListCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ListCard({
+  title,
+  span,
+  children,
+}: {
+  title: string
+  span?: 2
+  children: React.ReactNode
+}) {
+  const className = [styles.listCard, span === 2 && styles.span2].filter(Boolean).join(' ')
   return (
-    <div className={styles.listCard}>
+    <div className={className}>
       <h2>{title}</h2>
       {children}
     </div>
