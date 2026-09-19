@@ -57,6 +57,6 @@
   color: #fff;
 }
 
-.danger:hover {
+.actions .danger:hover {
   background: color-mix(in srgb, var(--danger) 85%, black);
 }
