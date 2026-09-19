@@ -6,13 +6,13 @@ and the money-precision strategy, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 ## Status
 
-Phase 1 (Foundation) through Phase 7 (Market) are complete and merged to
-`master` (PR #2). Phase 8 (Dashboard & analytics) is implemented on branch
-`phase-8-dashboard`, pending PR review. The repo is public on GitHub
+Phase 1 (Foundation) through Phase 8 (Dashboard & analytics) are complete
+and merged to `master` (PRs #2 and #3). Phase 9 (Polish) is in progress on
+branch `phase-9-polish`. The repo is public on GitHub
 (https://github.com/bwz-kk/personal-finance-manager). A `claude-design`
 branch produced `design/README.md` (a design system derived from the app's
-real code/tokens), merged via PR #1. `README.md` is still temporarily
-removed; it'll be rewritten once the core application is done — Phase 9.
+real code/tokens), merged via PR #1. `README.md` has been rewritten as part
+of Phase 9.
 
 Starting with Phase 7, each phase in the phased implementation plan below is
 its own milestone: it gets its own branch (named `phase-N-<slug>`) and merges
