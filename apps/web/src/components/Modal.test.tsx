@@ -65,4 +65,20 @@ describe('Modal', () => {
     await user.tab({ shift: true })
     expect(screen.getByText('Second field')).toHaveFocus()
   })
+
+  it('skips a disabled first field for autofocus and Tab-trap', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal title="Test modal" onClose={() => {}}>
+        <select aria-label="Disabled field" disabled>
+          <option>x</option>
+        </select>
+        <input aria-label="Enabled field" />
+        <button>Last button</button>
+      </Modal>,
+    )
+    expect(screen.getByLabelText('Enabled field')).toHaveFocus()
+    await user.tab({ shift: true })
+    expect(screen.getByText('Last button')).toHaveFocus()
+  })
 })
