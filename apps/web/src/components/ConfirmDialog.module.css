@@ -15,6 +15,7 @@
   padding: 1.5rem;
   max-width: 360px;
   width: 90%;
+  box-shadow: var(--shadow-lg);
 }
 
 .dialog h2 {
@@ -41,10 +42,21 @@
   background: var(--bg-subtle);
   color: var(--text);
   cursor: pointer;
+  transition:
+    background-color var(--motion-standard),
+    border-color var(--motion-standard);
+}
+
+.actions button:hover {
+  background: var(--border);
 }
 
 .danger {
   background: var(--danger);
   border-color: var(--danger);
   color: #fff;
+}
+
+.actions .danger:hover {
+  background: color-mix(in srgb, var(--danger) 85%, black);
 }
