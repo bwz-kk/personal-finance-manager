@@ -6,6 +6,10 @@ for technical rationale see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Current state
 
+**[v0.1.0](https://github.com/bwz-kk/personal-finance-manager/releases/tag/v0.1.0)
+released** (`21bd02c`, tag `v0.1.0`) — first public release. Version bumped
+`0.0.0` → `0.1.0` across all workspace `package.json` files.
+
 SPEC.md's phased plan is complete (see prior handoff history below for
 Phase 9). Three more PRs have since merged into `master`, and one design
 exploration was closed unmerged:
@@ -127,12 +131,13 @@ is broken.
 
 ## Verification baseline
 
-`master` at `7787637`: `npm run typecheck && npm run lint && npm run test
-&& npm run format:check` all pass — 89 `apps/api` domain tests + 12
-`packages/shared` tests + 25 `apps/web` tests (126 total). Live-Chrome
-verification this session covered: CDI reference/refresh and projected
-value on the Investments tab, investment-transaction cash auto-deduction,
-the Daily Spending tab (overall average, per-category cards, bar chart) in
-both languages, and the language dialog (opens, lists both languages,
-switches and closes on selection) at both a small and a ~1512×900 desktop
-viewport.
+`master` at `21bd02c` (`v0.1.0`): `npm run typecheck && npm run lint &&
+npm run test && npm run format:check` all pass — 89 `apps/api` domain
+tests + 12 `packages/shared` tests + 25 `apps/web` tests (126 total).
+Pre-release repo scan found no committed secrets, `.env` files, DB files,
+or build artifacts. Live-Chrome verification this session covered: CDI
+reference/refresh and projected value on the Investments tab,
+investment-transaction cash auto-deduction, the Daily Spending tab
+(overall average, per-category cards, bar chart) in both languages, and
+the language dialog (opens, lists both languages, switches and closes on
+selection) at both a small and a ~1512×900 desktop viewport.

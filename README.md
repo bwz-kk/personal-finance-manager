@@ -1,8 +1,9 @@
 # Personal Finance Manager
 
 A local-first, single-user personal finance app: transactions, budgets,
-investments, an investment-suggestion planner, financial goals, and a
-market/watchlist for prices you want to track.
+investments (with CDI return projection), an investment-suggestion planner,
+financial goals, a daily-spending breakdown, and a market/watchlist for
+prices you want to track. EN / PT-BR.
 
 ## Local-first, not a SaaS product
 
@@ -96,8 +97,10 @@ Run from the repo root (npm workspaces):
 
 ## Status
 
-Phases 1–8 of the implementation plan are complete; Phase 9 (polish) is in
-progress. See [`SPEC.md`](SPEC.md#status) for phase-by-phase detail.
+[v0.1.0](https://github.com/bwz-kk/personal-finance-manager/releases/tag/v0.1.0)
+— first release. SPEC.md's phased plan is complete; see
+[`HANDOFF.md`](HANDOFF.md) for what's shipped since and
+[`SPEC.md`](SPEC.md#status) for phase-by-phase detail.
 
 ## License
 
