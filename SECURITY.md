@@ -35,8 +35,9 @@ no bug bounty — this is a personal project, not a company.
 
 ## Supported versions
 
-Only the latest commit on `main` is supported. There are no released
-versions to backport fixes to.
+Only the latest commit on `master` is supported. Released versions (e.g.
+[`v0.1.0`](https://github.com/bwz-kk/personal-finance-manager/releases))
+are not backported — fixes land on `master` only.
 
 ## Data handling
 
