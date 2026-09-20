@@ -220,6 +220,8 @@ export interface Translations {
     title: string
     average: string
     totalExpenses: string
+    byCategory: string
+    noSpending: string
     loading: string
     loadError: string
   }
@@ -460,6 +462,8 @@ export const translations: Record<Language, Translations> = {
       title: 'Daily Spending',
       average: 'Average daily spending',
       totalExpenses: 'Total expenses this period',
+      byCategory: 'Average daily spending by category',
+      noSpending: 'No spending recorded this month.',
       loading: 'Loading…',
       loadError: 'Failed to load daily spending.',
     },
@@ -699,6 +703,8 @@ export const translations: Record<Language, Translations> = {
       title: 'Gasto Diário',
       average: 'Gasto médio diário',
       totalExpenses: 'Total de despesas no período',
+      byCategory: 'Gasto médio diário por categoria',
+      noSpending: 'Nenhum gasto registrado neste mês.',
       loading: 'Carregando…',
       loadError: 'Falha ao carregar o gasto diário.',
     },

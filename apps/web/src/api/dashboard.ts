@@ -29,6 +29,7 @@ export interface SpendingByCategoryEntry {
   categoryId: string
   categoryName: string
   amountMinor: number
+  averageDailyMinor: number
 }
 
 export interface MonthlyTrendEntry {

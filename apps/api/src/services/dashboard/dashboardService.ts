@@ -95,6 +95,11 @@ export async function getDashboard(month: string = currentMonth()) {
       categoryId: row.categoryId,
       categoryName: categoryById.get(row.categoryId)?.name ?? row.categoryId,
       amountMinor: row._sum.amountMinor ?? 0,
+      averageDailyMinor: averageDailySpendingMinor(
+        row._sum.amountMinor ?? 0,
+        periodStart,
+        periodEnd,
+      ),
     }))
     .sort((a, b) => b.amountMinor - a.amountMinor)
 
