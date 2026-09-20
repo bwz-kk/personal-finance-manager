@@ -19,10 +19,6 @@ export function Layout() {
 
   return (
     <div className={styles.shell}>
-      <div className={styles.meshBg} aria-hidden="true">
-        <div className={styles.blobA} />
-        <div className={styles.blobB} />
-      </div>
       <nav className={styles.nav}>
         <div className={styles.brand}>Personal Finance</div>
         <ul className={styles.navList}>
