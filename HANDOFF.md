@@ -6,103 +6,133 @@ for technical rationale see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Current state
 
-Both PRs from the last session are merged into `master`:
+SPEC.md's phased plan is complete (see prior handoff history below for
+Phase 9). Three more PRs have since merged into `master`, and one design
+exploration was closed unmerged:
 
-- **PR #4** (`phase-9-polish`) — Phase 9 (Polish): error handling (root
-  `ErrorBoundary`), accessibility (`useDialogA11y`: autofocus/Escape/
-  focus-restore/Tab-trap in `Modal` and `ConfirmDialog`), frontend test infra
-  (vitest+jsdom+RTL in `apps/web`, first tests in `packages/shared`), a
-  performance audit (documented, no changes needed at this app's scale),
-  `.nvmrc`/`engines`, `README.md`, MIT `LICENSE`.
-- **PR #5** (`ui-polish-skiper`, rebased onto `master` after #4 merged for a
-  clean diff) — UI polish: `AnimatedNumber` (new `framer-motion` dep) for
-  Dashboard stat-card count-up, shared `--shadow-sm`/`--shadow-lg`/
-  `--motion-standard` tokens applied to cards/modals/hover states, and a
-  bento-grid restructure of the Dashboard with a gradient-fade hero balance
-  card.
+- **PR #6** (`feature/investments-cash-cdi`) — CDI (Brazilian interbank
+  rate) reference/return projection on the Investments tab (new
+  `CdiDailyRate` model, `cdiRateService.ts` caching against the BCB SGS API,
+  pure `projectCdiIndexedValue` domain function), and BRL investment
+  transactions now auto-create a linked cash `Transaction` (BUY/DEPOSIT →
+  expense, SELL/WITHDRAWAL/DIVIDEND/INTEREST → income) so investing actually
+  deducts from cash balance instead of a separate ad-hoc formula.
+- **PR #7** (`feature/daily-spending-tab`) — new "Daily Spending" nav tab
+  (`/daily-spending`): average daily spending for the selected month
+  (`averageDailySpendingMinor` domain function, elapsed-days-in-month
+  denominator) plus the same average broken out per category, with a bar
+  chart.
+- **PR #9** (`feature/language-dialog`) — replaced the two-button EN/PT-BR
+  toggle with a shadcn `Dialog` picker (`LanguageDialog.tsx`): one trigger
+  button showing the current language, opens a dialog listing both with
+  flags. Added the shadcn `dialog.tsx` primitive (`npx shadcn add dialog`,
+  no new npm dependency — `@base-ui/react` was already installed).
+- **PR #8** (`feature/mesh-background`) — **closed unmerged, branch
+  deleted.** A background-visual exploration (drifting mesh blobs →
+  translucent card backgrounds → a diagonal "cosmic light beam" built via
+  the superpowers visual-companion tool against user-supplied reference
+  screenshots → user rejected the beam, reverted to blobs → then asked to
+  remove the blobs too). Net effect on `master`: **none** — no background
+  decoration, no `--bg-card` token. If background/visual-polish work comes
+  up again, start fresh; don't resurrect this branch's approach without
+  re-confirming direction with the user first (three rounds of "not quite"
+  on this one).
 
-**Phase 9 is complete — SPEC.md's whole phased plan is now done.**
+Each PR went through this app's usual `/review` → fix → merge cycle; review
+findings for #6 and #9 are summarized below since they're genuine
+correctness/coverage fixes, not style nits.
 
-A second review pass (two subagents, one per PR) caught two more real bugs
-before merge, both fixed:
+## Review findings fixed (not bugs anymore, but worth knowing why)
 
-- `useDialogA11y`'s `FOCUSABLE_SELECTOR` matched disabled elements. A dialog
-  whose first focusable child is disabled (e.g. `BudgetForm`'s category
-  `<select>` in edit mode) silently failed to autofocus, and the Tab-trap's
-  boundary check could never match that disabled element, so Shift+Tab
-  escaped the modal backward instead of wrapping. Fixed: selector now
-  excludes `:disabled`. Regression test added to `Modal.test.tsx`.
-- `ConfirmDialog.module.css`'s `.danger:hover` was unreachable — beaten by
-  `.actions button:hover` on a specificity tie (that rule's type selector
-  won the tiebreak) — so the destructive delete button never showed its
-  darkened hover state. Fixed by scoping it `.actions .danger:hover`.
+**PR #6 — Critical: `getCdiDailyRates` cache-gap detection.** The original
+caching logic only checked whether the single globally-latest cached CDI
+date covered the request, not whether the request's start date did. Any
+investment whose date range predated another already-cached window (e.g.
+two CDI investments opened months apart) got a silently truncated/wrong
+projection. Fixed by extracting a pure `missingCdiRanges` function
+(`apps/api/src/domain/cdiRateGaps.ts`) that checks both ends of the cached
+window, with a named regression test for exactly this scenario.
 
-Local branches `phase-7-market`, `phase-8-dashboard`, `claude-design`,
-`phase-9-polish`, `ui-polish-skiper`, and `worktree-agent-ac0a8777fe7cfb61d`
-are all fully merged and safe to delete (`git branch -d <name>`) — nobody's
-asked for that cleanup yet.
+**PR #6 — Important: currency case sensitivity.** `investment.currency ===
+'BRL'` relied on frontend `.toUpperCase()` only, not enforced at the Zod
+boundary — violates this repo's "never trust frontend validation alone"
+rule. Fixed with `.transform((s) => s.toUpperCase())` in the validation
+schema.
 
-## Known follow-ups (not bugs, flagged by review, not yet acted on)
+**PR #9 — Suggestions:** no test file existed for `LanguageDialog.tsx`
+despite this repo's convention of testing small interactive components
+(`Modal.test.tsx`, `ConfirmDialog.test.tsx`); added one. Also added a
+one-line comment explaining why the trigger mixes inline `style` (this
+app's `--border`/`--text` tokens) with Tailwind utility classes (shadcn's
+own tokens) — intentional per the two-token-system split documented in
+`CLAUDE.md`, not an oversight.
 
-- Dashboard's count-up animation doesn't fire when navigating to a
-  not-yet-cached month — `useDashboard` has no `placeholderData`, so the
-  whole grid unmounts/remounts with the final value already set. Fix would
-  be `placeholderData: (prev) => prev` on the query (TanStack Query v5).
-- The hero balance card's gradient highlight corner drops white-text
-  contrast below WCAG AA (~2.4:1 vs. the 4.5:1 minimum) in roughly the
-  top-left ~15% of the card.
-- `AnimatedNumber.test.tsx` only covers the synchronous first-render output;
-  no test drives an actual value change or the reduced-motion path.
+## Key decisions made this session
 
-## Key decisions made across these two sessions
+**CDI + cash-deduction scope** was clarified with the user up front via
+`superpowers:brainstorming` (bounded path) before writing any code, per
+`CLAUDE.md`'s rule to ask before financial-calculation-affecting changes:
+CDI became a full live-rate return-projection feature (not just a label),
+and cash-deduction became auto-linked `Transaction` rows (not a formula).
+A backfill script (`apps/api/scripts/backfillInvestmentCashLinks.ts`) was
+written and run once so the visible cash balance didn't jump when the old
+`dashboardService.ts` ad-hoc `brlInvestedMinor` subtraction was removed in
+favor of the new auto-linked transactions (which also fixed a pre-existing
+Dashboard-vs-Transactions balance inconsistency as a bonus).
 
-**Phase 9 scope** was decomposed and confirmed with the user up front, in
-order: error handling → accessibility → frontend tests → performance audit
-→ dev experience → docs/README. Each shipped as its own commit, verified
-(typecheck/lint/format/test, + live in Chrome) before moving to the next.
+**Daily Spending scope**: started as a single dashboard stat card, then
+the user asked for it as its own tab instead (better UX than a lone number
+buried in the bento grid), then asked for a per-category breakdown too.
+Each step reused the existing `/dashboard` endpoint/query rather than
+adding new backend surface, until the per-category ask required extending
+the endpoint's `spendingByCategory` entries with `averageDailyMinor`.
 
-**Subagent review + research, run in parallel**: once each PR was open, a
-subagent reviewed it while, for PR #5, a second researched Skiper UI
-(skiper-ui.com) so the two didn't block each other. A second review pass
-after both PRs were open (one subagent per PR) caught the two bugs listed
-above.
+**Background/visual work needs the visual-companion tool, not text-only
+iteration.** The PR #8 exploration burned many rounds because early
+iterations were built from a text description of what the user wanted
+("gradients and mockups") before reference images existed; once actual
+reference screenshots were provided, mockups converged faster (though
+still didn't survive contact with a real full-width viewport — see below).
+For any future "make it look like X" request, ask for or generate visual
+mockups via the brainstorming skill's visual-companion tool before writing
+app code.
 
-**Skiper UI findings**: it's a shadcn-style copy-paste component registry
-(`npx shadcn add @skiper-ui/skiperN`), no runtime npm package. It has **no**
-table, chart, or dialog components — those stay on shadcn/Base UI,
-untouched. Its two applicable pieces for this app: an animated-number
-pattern (→ `AnimatedNumber`) and the motion signature already sitting unused
-in the vendored `apps/web/src/components/ui/skiper-ui/skiper40.tsx` (300ms
-`cubic-bezier(0.4,0,0.2,1)`, `motion-reduce:`-aware) — now applied via a
-shared `--motion-standard` token.
+**Mockup-to-real-viewport scaling is not automatic.** Twice this session
+(the original mesh blobs, and the "cosmic beam"), a design that looked
+right in the visual-companion tool's small preview box (~800×380px)
+rendered as barely-visible or wrongly-proportioned on a real ~1500px-wide
+desktop viewport. Fixed the beam case by switching from a
+rotated/oversized rectangle (tuned in absolute px against the small
+mockup) to a plain `linear-gradient(angle, ...)` — a gradient's bright
+stop is corner-to-corner by construction and its percentage stops scale
+with the box automatically, no manual trig needed. Prefer that technique
+over rotated/positioned decorative elements for any future full-viewport
+background effect; always verify against a real desktop width (`resize_window`
+to ~1512×900) in the browser tool, not just the mockup preview, before
+calling a background design done.
 
-**Design-reference photos** (`~/Pictures/financial-manager/`): a mobile
-fintech app with a lime-green radial-gradient-glow background, and a desktop
-"FinFlex" dashboard with a mixed-size bento card grid + gradient hero
-balance card. User explicitly chose to **keep this app's existing
-blue/green/red accent tokens** rather than adopt the reference's lime-green
-palette — the gradient-fade and bento-grid _structure_ were adopted, not the
-color scheme.
-
-**Frontend styling** (prior session): Tailwind CSS v4 + shadcn/ui added to
-`apps/web` **alongside** the CSS Modules every page still uses — not a
-migration. shadcn's tokens live under a `--sc-` prefix in `index.css`
-specifically so they never collide with this app's pre-existing
-`--bg`/`--accent`/`--border`/etc. tokens.
-
-**Claude Design**: a separate `claude-design` branch (merged, PR #1)
-produced `design/README.md` — a design system derived from the app's real
-code/tokens. Design/UI work continues to get its own branch, independent of
-phase branches.
+**Dev server survives branch switches, but its CSS Modules cache can
+desync.** Mid-session, switching branches several times under the running
+`npm run dev` process (started by the user, not this session) left
+`Layout.module.css`'s compiled output empty (`export default {}`) even
+though the file on disk was valid — confirmed via `npx vite build`
+succeeding and `lightningcss` parsing the file standalone without error.
+Fix was `touch vite.config.ts` to force Vite's dev server to fully
+restart, which is non-destructive to the user's terminal session. If a
+CSS Module's classes silently stop applying (elements render with
+`className=""`) after several git-branch switches under a live dev
+server, check the raw served module (`curl
+localhost:5173/src/path/File.module.css`) before assuming the CSS itself
+is broken.
 
 ## Verification baseline
 
-`master` at `9df9bc8`: `npm run typecheck && npm run lint && npm run test &&
-npm run format:check` all pass — 64 `apps/api` domain tests + 12
-`packages/shared` tests + 22 `apps/web` tests (97 total), `npm run build`
-clean. Live-Chrome verification from the prior session covered the
-`ErrorBoundary` fallback, `Modal`/`ConfirmDialog` focus/Escape behavior, the
-gradient hero card, animated count-up, and the 2-column/1-column responsive
-breakpoints — the 4-column desktop breakpoint (>900px) was **not** visually
-confirmed (the browser-automation tool's viewport was fixed-size and
-unresponsive to resize commands in that environment).
+`master` at `7787637`: `npm run typecheck && npm run lint && npm run test
+&& npm run format:check` all pass — 89 `apps/api` domain tests + 12
+`packages/shared` tests + 25 `apps/web` tests (126 total). Live-Chrome
+verification this session covered: CDI reference/refresh and projected
+value on the Investments tab, investment-transaction cash auto-deduction,
+the Daily Spending tab (overall average, per-category cards, bar chart) in
+both languages, and the language dialog (opens, lists both languages,
+switches and closes on selection) at both a small and a ~1512×900 desktop
+viewport.
