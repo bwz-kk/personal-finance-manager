@@ -48,11 +48,11 @@ enum WatchlistAssetClass {
 }
 
 model Category {
-  id           String            @id @default(cuid())
+  id           String          @id @default(cuid())
   name         String
   type         TransactionType
-  isSystem     Boolean           @default(false)
-  createdAt    DateTime          @default(now())
+  isSystem     Boolean         @default(false)
+  createdAt    DateTime        @default(now())
   transactions Transaction[]
   budgets      Budget[]
 
@@ -60,17 +60,18 @@ model Category {
 }
 
 model Transaction {
-  id          String           @id @default(cuid())
-  type        TransactionType
-  amountMinor Int
-  currency    String           @default("BRL")
-  description String
-  date        DateTime
-  categoryId  String
-  category    Category         @relation(fields: [categoryId], references: [id])
-  notes       String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                    String                 @id @default(cuid())
+  type                  TransactionType
+  amountMinor           Int
+  currency              String                 @default("BRL")
+  description           String
+  date                  DateTime
+  categoryId            String
+  category              Category               @relation(fields: [categoryId], references: [id])
+  notes                 String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  investmentTransaction InvestmentTransaction?
 
   @@index([date])
   @@index([categoryId])
@@ -78,12 +79,12 @@ model Transaction {
 }
 
 model Budget {
-  id           String   @id @default(cuid())
-  categoryId   String
-  category     Category @relation(fields: [categoryId], references: [id])
-  month        String // "YYYY-MM"
-  limitMinor   Int
-  createdAt    DateTime @default(now())
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  month      String // "YYYY-MM"
+  limitMinor Int
+  createdAt  DateTime @default(now())
 
   @@unique([categoryId, month])
   @@index([month])
@@ -95,7 +96,7 @@ model Budget {
 // one exception: there's no live pricing yet, so it's a manual mark-to-market
 // field (or refreshed via watchlistSymbol once Phase 7 adds that).
 model Investment {
-  id                String                   @id @default(cuid())
+  id                String                  @id @default(cuid())
   name              String
   assetType         AssetType
   institution       String?
@@ -103,26 +104,44 @@ model Investment {
   purchaseDate      DateTime?
   currentValueMinor Int? // manually updated, or refreshed via watchlistSymbol
   watchlistSymbol   String? // optional link to WatchlistItem.symbol for auto-refresh
+  cdiPercent        Float? // e.g. 116 = "116% of CDI" — fixed for the investment's life
   notes             String?
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
   transactions      InvestmentTransaction[]
 }
 
+// BUY/DEPOSIT/SELL/WITHDRAWAL/DIVIDEND/INTEREST on a BRL investment auto-link
+// a cash Transaction (see investmentTransactionService.ts) so cash balance
+// stays correct without manual double-entry. OTHER and non-BRL investments
+// never link. onDelete: SetNull rather than a DB cascade because deleting
+// the pair is orchestrated by the service (in one prisma.$transaction), not
+// by referential action — SetNull just keeps this row valid if its cash
+// Transaction is ever removed some other way.
 model InvestmentTransaction {
-  id                 String                     @id @default(cuid())
-  investmentId       String
-  investment         Investment                 @relation(fields: [investmentId], references: [id], onDelete: Cascade)
-  type               InvestmentTransactionType
-  amountMinor        Int
-  quantity           String? // decimal string
-  pricePerUnitMinor  Int?
-  date               DateTime
-  notes              String?
-  createdAt          DateTime                   @default(now())
+  id                String                    @id @default(cuid())
+  investmentId      String
+  investment        Investment                @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  type              InvestmentTransactionType
+  amountMinor       Int
+  quantity          String? // decimal string
+  pricePerUnitMinor Int?
+  date              DateTime
+  notes             String?
+  createdAt         DateTime                  @default(now())
+  cashTransactionId String?                   @unique
+  cashTransaction   Transaction?              @relation(fields: [cashTransactionId], references: [id], onDelete: SetNull)
 
   @@index([investmentId])
   @@index([date])
+}
+
+// Cached daily CDI rate (BCB SGS series 12, % per business day) — fetched
+// incrementally so a return projection never re-downloads history it
+// already has. See cdiRateService.ts.
+model CdiDailyRate {
+  date        DateTime @id
+  ratePercent String // decimal string, e.g. "0.041270"
 }
 
 model Goal {
@@ -139,13 +158,13 @@ model Goal {
 // Single active strategy, fixed id = "singleton" — this is a personal app
 // with one user and one plan configuration at a time.
 model InvestmentPlanConfig {
-  id                               String   @id @default("singleton")
-  minMonthlyInvestmentMinor        Int      @default(0)
-  targetInvestmentRate             Float    @default(0.1)
-  minCashBufferMinor               Int      @default(0)
-  maxPercentOfAvailableCash        Float    @default(0.5)
-  expectedRecurringExpensesMinor   Int      @default(0)
-  updatedAt                        DateTime @updatedAt
+  id                             String   @id @default("singleton")
+  minMonthlyInvestmentMinor      Int      @default(0)
+  targetInvestmentRate           Float    @default(0.1)
+  minCashBufferMinor             Int      @default(0)
+  maxPercentOfAvailableCash      Float    @default(0.5)
+  expectedRecurringExpensesMinor Int      @default(0)
+  updatedAt                      DateTime @updatedAt
 }
 
 model WatchlistItem {

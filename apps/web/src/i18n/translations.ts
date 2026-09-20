@@ -95,6 +95,10 @@ export interface Translations {
     currency: string
     currentValue: string
     currentValueOptional: string
+    cdiPercentOptional: string
+    currentCdi: string
+    cdiRateValue: (rate: string) => string
+    cdiProjectedValue: (cdiPercent: number) => string
     invested: string
     return: string
     empty: string
@@ -308,6 +312,10 @@ export const translations: Record<Language, Translations> = {
       currency: 'Currency',
       currentValue: 'Current value',
       currentValueOptional: 'Current value (optional)',
+      cdiPercentOptional: '% of CDI (optional)',
+      currentCdi: 'Current CDI',
+      cdiRateValue: (rate) => `${rate}% per business day`,
+      cdiProjectedValue: (cdiPercent) => `Projected value (${cdiPercent}% of CDI)`,
       invested: 'Invested',
       return: 'Return',
       empty: 'No investments yet.',
@@ -535,6 +543,10 @@ export const translations: Record<Language, Translations> = {
       currency: 'Moeda',
       currentValue: 'Valor atual',
       currentValueOptional: 'Valor atual (opcional)',
+      cdiPercentOptional: '% do CDI (opcional)',
+      currentCdi: 'CDI atual',
+      cdiRateValue: (rate) => `${rate}% ao dia útil`,
+      cdiProjectedValue: (cdiPercent) => `Valor projetado (${cdiPercent}% do CDI)`,
       invested: 'Investido',
       return: 'Retorno',
       empty: 'Nenhum investimento ainda.',

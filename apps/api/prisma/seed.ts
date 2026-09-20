@@ -2,7 +2,10 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const DEFAULT_INCOME_CATEGORIES = ['Salary', 'Freelance', 'Other Income']
+// "Investments" and "Investment Returns" back the auto-linked cash
+// Transaction created when a BRL investment moves cash — see
+// investmentTransactionService.ts.
+const DEFAULT_INCOME_CATEGORIES = ['Salary', 'Freelance', 'Other Income', 'Investment Returns']
 
 const DEFAULT_EXPENSE_CATEGORIES = [
   'Food',
@@ -12,6 +15,7 @@ const DEFAULT_EXPENSE_CATEGORIES = [
   'Subscriptions',
   'Shopping',
   'Other',
+  'Investments',
 ]
 
 async function main() {
@@ -30,6 +34,14 @@ async function main() {
       create: { name, type: 'EXPENSE', isSystem: true },
     })
   }
+
+  // Pre-populated so the current CDI rate is visible on the Investments tab
+  // without the user having to know to add it via the Market/Watchlist tab.
+  await prisma.watchlistItem.upsert({
+    where: { symbol: 'CDI' },
+    update: {},
+    create: { symbol: 'CDI', label: 'CDI', assetClass: 'INDICATOR' },
+  })
 }
 
 main()

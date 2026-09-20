@@ -10,6 +10,7 @@ export interface Investment {
   purchaseDate: string | null
   currentValueMinor: number | null
   watchlistSymbol: string | null
+  cdiPercent: number | null
   notes: string | null
   createdAt: string
   updatedAt: string
@@ -21,6 +22,7 @@ export interface Investment {
 
 export interface InvestmentDetail extends Investment {
   transactions: InvestmentTransaction[]
+  cdiProjectedValueMinor: number | null
 }
 
 export interface InvestmentTransaction {
@@ -41,6 +43,7 @@ export interface InvestmentInput {
   institution?: string
   currency: string
   currentValueMinor?: number
+  cdiPercent?: number
   notes?: string
 }
 
