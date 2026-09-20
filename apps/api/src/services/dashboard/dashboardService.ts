@@ -30,13 +30,11 @@ export async function getDashboard(month: string = currentMonth()) {
       listWatchlist(),
     ])
 
-  // Cash balance only nets against BRL-denominated investment contributions
-  // — Transaction rows are BRL-only (see docs/ARCHITECTURE.md's "Currency
-  // handling"), so a USD/EUR investment's contributions are never subtracted
-  // from a BRL balance. That would silently mix currencies.
-  const brlInvestedMinor =
-    portfolio.groups.find((g) => g.currency === 'BRL')?.totalInvestedMinor ?? 0
-  const cashBalanceMinor = calculateBalance(allTransactions).balanceMinor - brlInvestedMinor
+  // BRL investment contributions already reduce cash balance via an
+  // auto-linked Transaction row (see investmentTransactionService.ts), so
+  // this is just the plain balance — same number the Transactions page
+  // shows, no separate investment-subtraction formula needed here anymore.
+  const cashBalanceMinor = calculateBalance(allTransactions).balanceMinor
 
   const months = trailingMonths(month, TREND_MONTHS)
   const { start: trendStart } = monthDateRange(months[0]!)

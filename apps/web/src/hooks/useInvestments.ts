@@ -9,6 +9,10 @@ const DETAIL_KEY = (id: string) => ['investments', id]
 function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: INVESTMENTS_KEY })
   queryClient.invalidateQueries({ queryKey: PORTFOLIO_KEY })
+  // Adding/removing a BRL investment transaction can create/delete a linked
+  // cash Transaction, so cash balance and the transaction list may change.
+  queryClient.invalidateQueries({ queryKey: ['transactions'] })
+  queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 }
 
 export function useInvestments() {
