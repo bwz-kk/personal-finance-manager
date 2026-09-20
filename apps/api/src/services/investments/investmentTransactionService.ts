@@ -52,7 +52,7 @@ export async function createTransaction(
   }
 
   const categoryId = await getCashEffectCategoryId(cashEffect)
-  const [, investmentTransaction] = await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const cashTransaction = await tx.transaction.create({
       data: {
         type: cashEffect,
@@ -63,12 +63,10 @@ export async function createTransaction(
         categoryId,
       },
     })
-    const created = await tx.investmentTransaction.create({
+    return tx.investmentTransaction.create({
       data: { ...input, investmentId, cashTransactionId: cashTransaction.id },
     })
-    return [cashTransaction, created] as const
   })
-  return investmentTransaction
 }
 
 // Investment transactions form a history log — corrections happen by

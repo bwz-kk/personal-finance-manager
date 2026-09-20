@@ -6,11 +6,17 @@ const INVESTMENTS_KEY = ['investments']
 const PORTFOLIO_KEY = ['portfolio']
 const DETAIL_KEY = (id: string) => ['investments', id]
 
-function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
+function invalidateInvestments(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: INVESTMENTS_KEY })
   queryClient.invalidateQueries({ queryKey: PORTFOLIO_KEY })
-  // Adding/removing a BRL investment transaction can create/delete a linked
-  // cash Transaction, so cash balance and the transaction list may change.
+}
+
+// Deleting an investment or adding/removing one of its transactions can
+// create/delete a linked cash Transaction, so cash balance and the
+// transaction list may change too. Plain create/update never touch cash
+// (an Investment record carries no amount), so they skip this.
+function invalidateInvestmentsAndCash(queryClient: ReturnType<typeof useQueryClient>) {
+  invalidateInvestments(queryClient)
   queryClient.invalidateQueries({ queryKey: ['transactions'] })
   queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 }
@@ -35,7 +41,7 @@ export function useCreateInvestment() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: InvestmentInput) => investmentsApi.create(input),
-    onSuccess: () => invalidateAll(queryClient),
+    onSuccess: () => invalidateInvestments(queryClient),
   })
 }
 
@@ -44,7 +50,7 @@ export function useUpdateInvestment() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Partial<InvestmentInput> }) =>
       investmentsApi.update(id, input),
-    onSuccess: () => invalidateAll(queryClient),
+    onSuccess: () => invalidateInvestments(queryClient),
   })
 }
 
@@ -52,7 +58,7 @@ export function useDeleteInvestment() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => investmentsApi.remove(id),
-    onSuccess: () => invalidateAll(queryClient),
+    onSuccess: () => invalidateInvestmentsAndCash(queryClient),
   })
 }
 
@@ -67,7 +73,7 @@ export function useAddInvestmentTransaction() {
       input: InvestmentTransactionInput
     }) => investmentsApi.addTransaction(investmentId, input),
     onSuccess: (_data, { investmentId }) => {
-      invalidateAll(queryClient)
+      invalidateInvestmentsAndCash(queryClient)
       queryClient.invalidateQueries({ queryKey: DETAIL_KEY(investmentId) })
     },
   })
@@ -84,7 +90,7 @@ export function useRemoveInvestmentTransaction() {
       transactionId: string
     }) => investmentsApi.removeTransaction(investmentId, transactionId),
     onSuccess: (_data, { investmentId }) => {
-      invalidateAll(queryClient)
+      invalidateInvestmentsAndCash(queryClient)
       queryClient.invalidateQueries({ queryKey: DETAIL_KEY(investmentId) })
     },
   })

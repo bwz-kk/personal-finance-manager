@@ -1,4 +1,5 @@
 import type { CdiDailyRate as CdiDailyRateRow } from '@prisma/client'
+import { missingCdiRanges } from '../../domain/cdiRateGaps.js'
 import { prisma } from '../../lib/prisma.js'
 import { fetchWithTimeout } from './fetchWithTimeout.js'
 
@@ -20,10 +21,6 @@ function formatBcbDate(date: Date): string {
   return `${day}/${month}/${date.getUTCFullYear()}`
 }
 
-function addDays(date: Date, days: number): Date {
-  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000)
-}
-
 async function fetchRange(from: Date, to: Date): Promise<{ date: Date; ratePercent: string }[]> {
   const url = `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${SERIES_CODE}/dados?dataInicial=${formatBcbDate(from)}&dataFinal=${formatBcbDate(to)}&formato=json`
   const res = await fetchWithTimeout(url)
@@ -39,42 +36,42 @@ function toDomain(row: CdiDailyRateRow) {
  * (inclusive), fetching only whatever isn't already cached. Never
  * re-downloads a day it already has — same "survive the provider going
  * down" philosophy as MarketPriceCache, just shaped for a date range
- * instead of a single latest value. */
+ * instead of a single latest value. Checks both ends of what's cached (see
+ * missingCdiRanges), not just the latest date, so an older investment
+ * queried after a newer one already populated the cache still gets its own
+ * missing head range fetched instead of silently reusing an unrelated
+ * window. */
 export async function getCdiDailyRates(from: Date, to: Date) {
-  const cached = await prisma.cdiDailyRate.findMany({
-    where: { date: { gte: from, lte: to } },
-    orderBy: { date: 'asc' },
-  })
+  const [earliest, latest] = await Promise.all([
+    prisma.cdiDailyRate.findFirst({ orderBy: { date: 'asc' } }),
+    prisma.cdiDailyRate.findFirst({ orderBy: { date: 'desc' } }),
+  ])
+  const gaps = missingCdiRanges(
+    { earliest: earliest?.date ?? null, latest: latest?.date ?? null },
+    from,
+    to,
+  )
 
-  const latestCached = await prisma.cdiDailyRate.findFirst({ orderBy: { date: 'desc' } })
-  const missingFrom =
-    latestCached && latestCached.date.getTime() >= from.getTime()
-      ? addDays(latestCached.date, 1)
-      : from
-
-  if (missingFrom.getTime() > to.getTime()) {
-    return cached.map(toDomain)
-  }
-
-  let fetched: { date: Date; ratePercent: string }[] = []
-  try {
-    fetched = await fetchRange(missingFrom, to)
-  } catch {
-    // BCB is down or unreachable — fall back to whatever's cached rather
-    // than failing the whole projection over a missing tail of days.
-    return cached.map(toDomain)
-  }
-
-  if (fetched.length > 0) {
-    await prisma.$transaction(
-      fetched.map((entry) =>
-        prisma.cdiDailyRate.upsert({
-          where: { date: entry.date },
-          create: entry,
-          update: entry,
-        }),
-      ),
-    )
+  for (const gap of gaps) {
+    let fetched: { date: Date; ratePercent: string }[] = []
+    try {
+      fetched = await fetchRange(gap.from, gap.to)
+    } catch {
+      // BCB is down or unreachable — skip this gap and fall back to
+      // whatever's cached for it rather than failing the whole projection.
+      continue
+    }
+    if (fetched.length > 0) {
+      await prisma.$transaction(
+        fetched.map((entry) =>
+          prisma.cdiDailyRate.upsert({
+            where: { date: entry.date },
+            create: entry,
+            update: entry,
+          }),
+        ),
+      )
+    }
   }
 
   const all = await prisma.cdiDailyRate.findMany({
