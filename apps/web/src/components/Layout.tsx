@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { LANGUAGES, useLanguage } from '../i18n/LanguageContext'
+import { useLanguage } from '../i18n/LanguageContext'
 import { ErrorBoundary } from './ErrorBoundary'
+import { LanguageDialog } from './LanguageDialog'
 import styles from './Layout.module.css'
 
 export function Layout() {
-  const { language, setLanguage, t } = useLanguage()
+  const { t } = useLanguage()
 
   const navItems = [
     { to: '/', label: t.nav.dashboard, end: true },
@@ -37,16 +38,7 @@ export function Layout() {
           ))}
         </ul>
         <div className={styles.languageSwitch}>
-          {LANGUAGES.map((lang) => (
-            <button
-              key={lang}
-              type="button"
-              className={lang === language ? styles.langActive : styles.langButton}
-              onClick={() => setLanguage(lang)}
-            >
-              {lang === 'en' ? 'EN' : 'PT-BR'}
-            </button>
-          ))}
+          <LanguageDialog />
         </div>
       </nav>
       <main className={styles.content}>

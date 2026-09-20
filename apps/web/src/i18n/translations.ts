@@ -19,6 +19,7 @@ export interface Translations {
     save: string
     add: string
     comingSoon: string
+    language: string
   }
   errorBoundary: {
     title: string
@@ -245,6 +246,7 @@ export const translations: Record<Language, Translations> = {
       save: 'Save',
       add: 'Add',
       comingSoon: 'Coming in a later phase.',
+      language: 'Language',
     },
     errorBoundary: {
       title: 'Something went wrong',
@@ -485,6 +487,7 @@ export const translations: Record<Language, Translations> = {
       save: 'Salvar',
       add: 'Adicionar',
       comingSoon: 'Disponível em uma fase futura.',
+      language: 'Idioma',
     },
     errorBoundary: {
       title: 'Algo deu errado',
