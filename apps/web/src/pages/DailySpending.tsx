@@ -65,9 +65,18 @@ export function DailySpendingPage() {
                     name: s.categoryName,
                     value: s.averageDailyMinor / 100,
                   }))}
+                  margin={{ bottom: 32 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
+                  <XAxis
+                    dataKey="name"
+                    stroke="var(--text-muted)"
+                    fontSize={12}
+                    interval={0}
+                    angle={-30}
+                    textAnchor="end"
+                    height={60}
+                  />
                   <YAxis stroke="var(--text-muted)" fontSize={12} />
                   <Tooltip
                     contentStyle={{ background: 'var(--bg)', border: '1px solid var(--border)' }}

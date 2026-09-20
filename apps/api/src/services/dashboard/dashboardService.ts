@@ -36,11 +36,11 @@ export async function getDashboard(month: string = currentMonth()) {
   // this is just the plain balance — same number the Transactions page
   // shows, no separate investment-subtraction formula needed here anymore.
   const cashBalanceMinor = calculateBalance(allTransactions).balanceMinor
-  const averageDailySpending = averageDailySpendingMinor(
-    period.expenseMinor,
-    periodStart,
-    periodEnd,
-  )
+  // Same instant passed to every averageDailySpendingMinor call below, so
+  // the overall average and every per-category average divide by the same
+  // elapsed-days count — otherwise a call landing right at UTC midnight
+  // could disagree with the others by one day.
+  const now = new Date()
 
   const months = trailingMonths(month, TREND_MONTHS)
   const { start: trendStart } = monthDateRange(months[0]!)
@@ -99,6 +99,7 @@ export async function getDashboard(month: string = currentMonth()) {
         row._sum.amountMinor ?? 0,
         periodStart,
         periodEnd,
+        now,
       ),
     }))
     .sort((a, b) => b.amountMinor - a.amountMinor)
@@ -106,7 +107,12 @@ export async function getDashboard(month: string = currentMonth()) {
   return {
     month,
     cashBalanceMinor,
-    averageDailySpendingMinor: averageDailySpending,
+    averageDailySpendingMinor: averageDailySpendingMinor(
+      period.expenseMinor,
+      periodStart,
+      periodEnd,
+      now,
+    ),
     period,
     portfolio,
     plan,
