@@ -8,7 +8,13 @@
  * below every ordinary (z-index: auto) element, so opaque cards/nav still
  * hide it without needing z-index bumps of their own. Drift respects
  * prefers-reduced-motion via the global animation-duration override in
- * index.css. */
+ * index.css.
+ *
+ * Two treatments live side by side: a soft blob mesh for light mode (dark
+ * cosmic light rays would just look like faint smudges on a white page),
+ * and the cosmic light-ray treatment for dark mode. Each half is hidden
+ * outright (`display: none`) rather than just transparent, so the unused
+ * one never pays for its blur()/backdrop cost. */
 .meshBg {
   position: fixed;
   inset: 0;
@@ -42,14 +48,10 @@
   animation: meshDriftB 11s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .blobA {
-    background: rgb(47 111 237 / 42%);
-  }
-
-  .blobB {
-    background: rgb(31 146 84 / 34%);
-  }
+.stars,
+.cornerWash,
+.stripWrap {
+  display: none;
 }
 
 @keyframes meshDriftA {
@@ -71,6 +73,64 @@
 
   50% {
     transform: translate(-26px, -18px);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .blobA,
+  .blobB {
+    display: none;
+  }
+
+  .stars,
+  .cornerWash,
+  .beam {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+
+  .stars {
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, rgb(255 255 255 / 90%) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 65% 12%, rgb(255 255 255 / 75%) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 75%, rgb(255 255 255 / 80%) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 55%, rgb(255 255 255 / 60%) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 90%, rgb(255 255 255 / 65%) 0%, transparent 100%);
+    background-repeat: repeat;
+    background-size: 340px 340px;
+  }
+
+  .cornerWash {
+    background: radial-gradient(
+      65% 75% at 0% 0%,
+      rgb(255 255 255 / 28%) 0%,
+      rgb(191 219 254 / 24%) 16%,
+      rgb(96 165 250 / 20%) 32%,
+      rgb(59 130 246 / 14%) 48%,
+      rgb(37 99 235 / 8%) 60%,
+      transparent 72%
+    );
+  }
+
+  /* A plain diagonal linear-gradient IS a corner-to-corner beam by
+   * construction — the bright stop forms a band perpendicular to the
+   * angle, at a percentage position that scales with the box automatically.
+   * No rotated/oversized rectangle math needed (that approach was tuned
+   * against a small mockup box and didn't scale to a real wide viewport). */
+  .beam {
+    background: linear-gradient(
+      130deg,
+      transparent 0%,
+      rgb(37 99 235 / 22%) 20%,
+      rgb(59 130 246 / 45%) 32%,
+      rgb(147 197 253 / 70%) 42%,
+      rgb(255 255 255 / 85%) 50%,
+      rgb(147 197 253 / 70%) 58%,
+      rgb(59 130 246 / 45%) 68%,
+      rgb(37 99 235 / 22%) 80%,
+      transparent 100%
+    );
   }
 }
 
