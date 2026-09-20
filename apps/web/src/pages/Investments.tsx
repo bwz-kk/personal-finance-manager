@@ -14,6 +14,7 @@ import {
   useUpdateInvestment,
   usePortfolio,
 } from '../hooks/useInvestments'
+import { useRefreshWatchlistItem, useWatchlist } from '../hooks/useMarket'
 import { useLanguage } from '../i18n/LanguageContext'
 import type { Investment, InvestmentInput, InvestmentTransaction } from '../api/investments'
 import styles from './Investments.module.css'
@@ -30,6 +31,8 @@ export function InvestmentsPage() {
   const investmentsQuery = useInvestments()
   const portfolioQuery = usePortfolio()
   const detailQuery = useInvestment(expandedId)
+  const watchlistQuery = useWatchlist()
+  const refreshWatchlistItem = useRefreshWatchlistItem()
 
   const createInvestment = useCreateInvestment()
   const updateInvestment = useUpdateInvestment()
@@ -39,6 +42,7 @@ export function InvestmentsPage() {
 
   const investments = investmentsQuery.data ?? []
   const portfolioGroups = portfolioQuery.data?.groups ?? []
+  const cdiItem = watchlistQuery.data?.find((item) => item.symbol === 'CDI')
 
   function closeForm() {
     setFormOpen(false)
@@ -79,6 +83,22 @@ export function InvestmentsPage() {
           {t.investments.addInvestment}
         </button>
       </div>
+
+      {cdiItem && (
+        <div className={styles.cdiReference}>
+          <span>
+            {t.investments.currentCdi}:{' '}
+            {cdiItem.price ? t.investments.cdiRateValue(cdiItem.price) : t.market.noPriceYet}
+          </span>
+          <button
+            type="button"
+            onClick={() => refreshWatchlistItem.mutate(cdiItem.id)}
+            disabled={refreshWatchlistItem.isPending}
+          >
+            {t.market.refresh}
+          </button>
+        </div>
+      )}
 
       {portfolioGroups.length > 0 && (
         <div className={styles.portfolio}>
@@ -174,6 +194,15 @@ export function InvestmentsPage() {
               {expanded && (
                 <div className={styles.transactions}>
                   {detailQuery.isLoading && <p>{t.investments.loading}</p>}
+                  {investment.cdiPercent != null && detailQuery.data && (
+                    <p className={styles.cdiProjection}>
+                      {t.investments.cdiProjectedValue(investment.cdiPercent)}:{' '}
+                      {formatMinorUnits(
+                        detailQuery.data.cdiProjectedValueMinor ?? 0,
+                        investment.currency,
+                      )}
+                    </p>
+                  )}
                   {detailQuery.data && detailQuery.data.transactions.length === 0 && (
                     <p className={styles.empty}>{t.investments.noTransactions}</p>
                   )}

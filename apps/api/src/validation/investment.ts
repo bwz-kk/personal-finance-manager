@@ -9,6 +9,7 @@ export const createInvestmentSchema = z.object({
   purchaseDate: z.coerce.date().optional(),
   currentValueMinor: z.number().int().nonnegative().optional(),
   watchlistSymbol: z.string().trim().max(20).optional(),
+  cdiPercent: z.number().positive().optional(),
   notes: z.string().trim().max(1000).optional(),
 })
 

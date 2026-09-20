@@ -21,6 +21,7 @@ export function InvestmentForm({ initial, onSubmit, onCancel, submitting }: Inve
   const [currentValue, setCurrentValue] = useState(
     initial?.currentValueMinor != null ? minorUnitsToDecimalInput(initial.currentValueMinor) : '',
   )
+  const [cdiPercent, setCdiPercent] = useState(initial?.cdiPercent?.toString() ?? '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
 
   function handleSubmit(e: FormEvent) {
@@ -31,6 +32,7 @@ export function InvestmentForm({ initial, onSubmit, onCancel, submitting }: Inve
       institution: institution.trim() ? institution.trim() : undefined,
       currency: currency.trim().toUpperCase(),
       currentValueMinor: currentValue.trim() ? decimalInputToMinorUnits(currentValue) : undefined,
+      cdiPercent: cdiPercent.trim() ? Number(cdiPercent) : undefined,
       notes: notes.trim() ? notes.trim() : undefined,
     })
   }
@@ -91,6 +93,18 @@ export function InvestmentForm({ initial, onSubmit, onCancel, submitting }: Inve
           min="0"
           value={currentValue}
           onChange={(e) => setCurrentValue(e.target.value)}
+        />
+      </label>
+
+      <label className={styles.field}>
+        {t.investments.cdiPercentOptional}
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="116"
+          value={cdiPercent}
+          onChange={(e) => setCdiPercent(e.target.value)}
         />
       </label>
 
