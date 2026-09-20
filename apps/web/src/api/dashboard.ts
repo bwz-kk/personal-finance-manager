@@ -29,6 +29,7 @@ export interface SpendingByCategoryEntry {
   categoryId: string
   categoryName: string
   amountMinor: number
+  averageDailyMinor: number
 }
 
 export interface MonthlyTrendEntry {
@@ -45,6 +46,7 @@ export interface InvestmentContributionEntry {
 export interface Dashboard {
   month: string
   cashBalanceMinor: number
+  averageDailySpendingMinor: number
   period: DashboardPeriod
   portfolio: Portfolio
   plan: DashboardPlan
