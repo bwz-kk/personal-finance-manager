@@ -31,3 +31,4 @@ npm-debug.log*
 
 # vitest / coverage
 coverage/
+.superpowers/
