@@ -8,6 +8,7 @@ export function Layout() {
 
   const navItems = [
     { to: '/', label: t.nav.dashboard, end: true },
+    { to: '/daily-spending', label: t.nav.dailySpending },
     { to: '/transactions', label: t.nav.transactions },
     { to: '/budgets', label: t.nav.budgets },
     { to: '/investments', label: t.nav.investments },

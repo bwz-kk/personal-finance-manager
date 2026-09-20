@@ -1,4 +1,5 @@
 import { calculateBalance } from '../../domain/balanceCalculator.js'
+import { averageDailySpendingMinor } from '../../domain/dailySpending.js'
 import { currentMonth, monthDateRange } from '../../domain/dateRange.js'
 import { bucketMinorByMonth, trailingMonths } from '../../domain/monthlySeries.js'
 import { CONTRIBUTION_TYPES, WITHDRAWAL_TYPES } from '../../domain/portfolioCalculator.js'
@@ -35,6 +36,11 @@ export async function getDashboard(month: string = currentMonth()) {
   // this is just the plain balance — same number the Transactions page
   // shows, no separate investment-subtraction formula needed here anymore.
   const cashBalanceMinor = calculateBalance(allTransactions).balanceMinor
+  const averageDailySpending = averageDailySpendingMinor(
+    period.expenseMinor,
+    periodStart,
+    periodEnd,
+  )
 
   const months = trailingMonths(month, TREND_MONTHS)
   const { start: trendStart } = monthDateRange(months[0]!)
@@ -95,6 +101,7 @@ export async function getDashboard(month: string = currentMonth()) {
   return {
     month,
     cashBalanceMinor,
+    averageDailySpendingMinor: averageDailySpending,
     period,
     portfolio,
     plan,

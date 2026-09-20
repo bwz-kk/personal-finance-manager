@@ -45,6 +45,7 @@ export interface InvestmentContributionEntry {
 export interface Dashboard {
   month: string
   cashBalanceMinor: number
+  averageDailySpendingMinor: number
   period: DashboardPeriod
   portfolio: Portfolio
   plan: DashboardPlan

@@ -11,6 +11,7 @@ export interface Translations {
     planner: string
     goals: string
     market: string
+    dailySpending: string
   }
   common: {
     cancel: string
@@ -215,6 +216,13 @@ export interface Translations {
     loading: string
     loadError: string
   }
+  dailySpending: {
+    title: string
+    average: string
+    totalExpenses: string
+    loading: string
+    loadError: string
+  }
 }
 
 export const translations: Record<Language, Translations> = {
@@ -227,6 +235,7 @@ export const translations: Record<Language, Translations> = {
       planner: 'Planner',
       goals: 'Goals',
       market: 'Market',
+      dailySpending: 'Daily Spending',
     },
     common: {
       cancel: 'Cancel',
@@ -447,6 +456,13 @@ export const translations: Record<Language, Translations> = {
       loading: 'Loading dashboard…',
       loadError: 'Failed to load the dashboard.',
     },
+    dailySpending: {
+      title: 'Daily Spending',
+      average: 'Average daily spending',
+      totalExpenses: 'Total expenses this period',
+      loading: 'Loading…',
+      loadError: 'Failed to load daily spending.',
+    },
   },
   'pt-BR': {
     nav: {
@@ -457,6 +473,7 @@ export const translations: Record<Language, Translations> = {
       planner: 'Planejador',
       goals: 'Metas',
       market: 'Mercado',
+      dailySpending: 'Gasto Diário',
     },
     common: {
       cancel: 'Cancelar',
@@ -677,6 +694,13 @@ export const translations: Record<Language, Translations> = {
       noInvestments: 'Nenhum investimento ainda.',
       loading: 'Carregando painel…',
       loadError: 'Falha ao carregar o painel.',
+    },
+    dailySpending: {
+      title: 'Gasto Diário',
+      average: 'Gasto médio diário',
+      totalExpenses: 'Total de despesas no período',
+      loading: 'Carregando…',
+      loadError: 'Falha ao carregar o gasto diário.',
     },
   },
 }
