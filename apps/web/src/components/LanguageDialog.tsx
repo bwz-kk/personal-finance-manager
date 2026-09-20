@@ -12,6 +12,9 @@ export function LanguageDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {/* Tailwind utilities for layout/hover (shadcn's own tokens), inline
+          style for color/border so the trigger matches this app's existing
+          --border/--text tokens rather than shadcn's separate palette. */}
       <DialogTrigger
         className="flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent"
         style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
