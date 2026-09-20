@@ -22,9 +22,6 @@ export function Layout() {
       <div className={styles.meshBg} aria-hidden="true">
         <div className={styles.blobA} />
         <div className={styles.blobB} />
-        <div className={styles.stars} />
-        <div className={styles.cornerWash} />
-        <div className={styles.beam} />
       </div>
       <nav className={styles.nav}>
         <div className={styles.brand}>Personal Finance</div>
